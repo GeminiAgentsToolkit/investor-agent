@@ -1,6 +1,6 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
-from datetime import datetime
-from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, AssetClass, GetAssetsRequest
+from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType
+from gemini_investor.alpaca_utils import create_option_ticker
 
 
 def check_if_trading_is_blocked():
@@ -26,6 +26,42 @@ def get_account_equity_value():
     This value isn’t calculated in the SDK it is computed on the server and we return the raw value here.
     """
     return f"{TradingClientSingleton.get_instance().get_account().equity}$"
+
+
+def buy_option_by_market_price(
+        underlying_symbol: str,
+        expiration_date: str,
+        option_type: str,
+        strike_price: float,
+        qty: int):
+    """Buy an option at market price, retuns the order id.
+
+    Args:
+        underlying_symbol: The underlying symbol of the option.
+        expiration_date: The expiration date of the option.
+        option_type: The type of the option. Should be 'C' (Call) or 'P' (Put).
+        strike_price: The strike price of the option.
+        qty: The quantity of the option to buy. Mush be a positive integer. You MUST provide it, even if qty is 1.
+    """
+    strike_price = float(strike_price)
+    qty = int(qty)
+    option_ticker = create_option_ticker(
+        underlying_symbol=underlying_symbol,
+        expiration_date=expiration_date,
+        option_type=option_type,
+        strike_price=strike_price,
+    )
+    market_order_data = MarketOrderRequest(
+        symbol=option_ticker,
+        qty=qty,
+        side=OrderSide.BUY,
+        time_in_force=TimeInForce.DAY,
+        type=OrderType.MARKET,
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
 
 
 def buy_stock_by_market_price(symbol: str, qty: int):
