@@ -1,0 +1,4 @@
+alpaca-py==0.28.0
+gemini_toolbox==0.1.0
+python-dotenv==1.0.1
+python-telegram-bot==20.6
