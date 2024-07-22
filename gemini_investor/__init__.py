@@ -1,6 +1,6 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
-from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType
-from gemini_investor.alpaca_utils import create_option_ticker
+from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass
+from gemini_investor.alpaca_utils import create_option_ticker, get_option_contract
 
 
 def check_if_trading_is_blocked():
@@ -107,3 +107,64 @@ def get_stocks_portfolio():
     """
     positions = TradingClientSingleton.get_instance().get_all_positions()
     return "\n".join([f"{pos.symbol}: {pos.qty}" for pos in positions if pos.qty != 0])
+
+
+def buy_option_by_limit_price(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price):
+    """
+    Buys an option contract at a specified limit price.
+
+    Args:
+        underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
+        expiration_date (str): Expiration date in YYYY-MM-DD format.
+        option_type (str): "C" for call, "P" for put.
+        strike_price (float): Strike price.
+        qty (int): Quantity of the option contract to buy.
+        limit_price (float): The limit price at which to buy the option contract.
+    """
+    option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
+    if not option_contract:
+        return "No suitable option contract found."
+    
+    limit_order_data = LimitOrderRequest(
+        symbol=option_contract.symbol,
+        qty=qty,
+        side=OrderSide.BUY,
+        time_in_force=TimeInForce.DAY,
+        limit_price=limit_price,
+        order_class=OrderClass.SIMPLE,  # For basic options orders
+    )
+    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+
+
+def sell_option_by_limit_price(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price):
+    """
+    Sells an option contract at a specified limit price.
+
+    Args:
+        underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
+        expiration_date (str): Expiration date in YYYY-MM-DD format.
+        option_type (str): "C" for call, "P" for put.
+        strike_price (float): Strike price.
+        qty (int): Quantity of the option contract to sell.
+        limit_price (float): The limit price at which to sell the option contract.
+    """
+    option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
+    if not option_contract:
+        return "can not sell, since no suitable owned option contract found."
+    
+    # Check if the option contract is in the portfolio (owned)
+    positions = TradingClientSingleton.get_instance().get_all_positions()
+    owned_option = next((pos for pos in positions if pos.symbol == option_contract.symbol), None)
+    if not owned_option or owned_option.qty < qty:
+        return f"Not enough {option_contract.symbol} contracts owned to sell."
+
+    limit_order_data = LimitOrderRequest(
+        symbol=option_contract.symbol,
+        qty=qty,
+        side=OrderSide.SELL,
+        time_in_force=TimeInForce.DAY,
+        limit_price=limit_price,
+        order_class=OrderClass.SIMPLE,  # For basic options orders
+    )
+    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+

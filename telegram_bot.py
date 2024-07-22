@@ -9,9 +9,6 @@ load_dotenv()
 chat_ids = [str(id) for id in os.getenv('TELEGRAM_CHAT_IDS').split(',')]
 telegram_token = os.getenv('TELEGRAM_TOKEN')
 
-PER_USER_MESSAGES = {}
-PER_USER_MESSAGES_LIMIT = 100
-
 import vertexai
 import inspect
 from vertexai.generative_models import (
@@ -37,7 +34,8 @@ vertexai.init(project="gemini-trading-backend", location="us-west1", credentials
 
 model = GenerativeModel(model_name="gemini-1.5-pro", tools=[all_functions_tools])
 
-client = client.GeminiChatClient(all_functions, model, debug=True)
+CLIENTS = {
+}
 
 
 async def start(update, context):
@@ -49,15 +47,11 @@ async def start(update, context):
 async def message(update, context):
     if update and update.message and str(update.message.chat_id) not in chat_ids:
         return
-    messages_history = PER_USER_MESSAGES.get(update.message.chat_id, [])
-    messages_history.append(f"user message: {update.message.text}")
-    full_message = "\n".join(messages_history)
-    # answer = create_crew_for_question(full_message).kickoff()
-    answer = client.send_message(full_message)
-    messages_history.append(f"jess: {answer}")
-    if len(messages_history) > PER_USER_MESSAGES_LIMIT:
-        messages_history = messages_history[-2:]
-    PER_USER_MESSAGES[update.message.chat_id] = messages_history
+    clt = CLIENTS.get(update.message.chat_id, None)
+    if not clt:
+        clt = client.GeminiChatClient(all_functions, model, debug=False)
+        CLIENTS[update.message.chat_id] = clt
+    answer = clt.send_message(update.message.text)
     await update.message.reply_text(answer)
 
 
