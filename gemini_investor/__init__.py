@@ -102,7 +102,7 @@ def sell_stock_by_market_price(symbol: str, qty: int):
     return market_order.client_order_id
 
 
-def get_stocks_portfolio():
+def get_portfolio():
     """Returns a string with the portfolio of the account.
     """
     positions = TradingClientSingleton.get_instance().get_all_positions()
