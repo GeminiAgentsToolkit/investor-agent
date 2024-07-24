@@ -64,6 +64,15 @@ def buy_option_by_market_price(
     return market_order.client_order_id
 
 
+def cancel_order_by_id(order_id: str):
+    """Remove/cancels an order by its id.
+    
+    Args:
+        order_id: The id of the order to remove.
+    """
+    TradingClientSingleton.get_instance().cancel_order_by_id(order_id=order_id)
+
+
 def buy_stock_by_market_price(symbol: str, qty: int):
     """Buy a stock at market price, retuns the order id.
     
