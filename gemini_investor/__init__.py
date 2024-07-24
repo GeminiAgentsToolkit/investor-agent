@@ -64,6 +64,16 @@ def buy_option_by_market_price(
     return market_order.client_order_id
 
 
+def get_order_by_id(order_id: str):
+    """Returns a string with the order details for the given order id.
+    
+    Args:
+        order_id: The id of the order to get.
+    """
+    order = TradingClientSingleton.get_instance().get_order_by_id(order_id=order_id)
+    return str(order)
+
+
 def cancel_order_by_id(order_id: str):
     """Remove/cancels an order by its id.
     

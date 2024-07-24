@@ -46,4 +46,6 @@ model = GenerativeModel(model_name="gemini-1.5-pro", tools=[all_functions_tools]
 client = client.GeminiChatClient(all_functions, model, debug=True)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
-print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
+#print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
+print(client.send_message("can you check order status with id 49fb647e-15e6-49f4-84c9-e5301798713b"))
+
