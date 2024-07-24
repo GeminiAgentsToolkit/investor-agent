@@ -1,5 +1,5 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
-from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass
+from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass, GetOrdersRequest, QueryOrderStatus
 from gemini_investor.alpaca_utils import create_option_ticker, get_option_contract
 
 
@@ -186,4 +186,28 @@ def sell_option_by_limit_price(underlying_symbol, expiration_date, option_type, 
         order_class=OrderClass.SIMPLE,  # For basic options orders
     )
     return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+
+
+def get_open_orders():
+    """Returns a string with the open orders for the account.
+    """
+    get_orders_data = GetOrdersRequest(
+        status=QueryOrderStatus.OPEN,
+        limit=100,
+        nested=True  # show nested multi-leg orders
+    )
+    orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
+    return "\n".join([str(order) for order in orders])
+
+
+def get_closed_orders():
+    """Returns a string with the closed orders for the account.
+    """
+    get_orders_data = GetOrdersRequest(
+        status=QueryOrderStatus.CLOSED,
+        limit=100,
+        nested=True  # show nested multi-leg orders
+    )
+    orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
+    return "\n".join([str(order) for order in orders])
 
