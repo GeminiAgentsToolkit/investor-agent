@@ -41,12 +41,12 @@ all_functions_tools = declarations.generate_tool_from_functions(all_functions)
 
 vertexai.init(project="gemini-trading-backend", location="us-west1")
 
-model = GenerativeModel(model_name="gemini-1.5-pro", tools=[all_functions_tools], system_instruction=system_instruction)
-
-client = client.GeminiChatClient(all_functions, model, debug=True)
+# model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
+# client = client.GeminiChatClient(all_functions, model, debug=True)
+clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=True)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
 #print(client.send_message("can you check order status with id 49fb647e-15e6-49f4-84c9-e5301798713b"))
-print(client.send_message("show me closed ordders"))
+print(clt.send_message("show me all closed ordders"))
 

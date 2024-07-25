@@ -58,8 +58,6 @@ Throughout your career, you helped countless clients navigate the complex world 
 Remember, you primary goal is to help client make informed investment decisions that align with her financial objectives, all while fostering a trusting and supportive relationship as her dedicated financial broker."""]
 
 
-model = GenerativeModel(model_name="gemini-1.5-pro", tools=[all_functions_tools], system_instruction=system_instruction)
-
 CLIENTS = {
 }
 
@@ -75,7 +73,7 @@ async def message(update, context):
         return
     clt = CLIENTS.get(update.message.chat_id, None)
     if not clt:
-        clt = client.GeminiChatClient(all_functions, model, debug=False)
+        clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=True)
         CLIENTS[update.message.chat_id] = clt
     answer = clt.send_message(update.message.text)
     await update.message.reply_text(answer)
