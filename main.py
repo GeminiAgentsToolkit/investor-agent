@@ -43,7 +43,7 @@ vertexai.init(project="gemini-trading-backend", location="us-west1")
 
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
-clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=True)
+clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=False, history_depth=3)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))

@@ -73,7 +73,7 @@ async def message(update, context):
         return
     clt = CLIENTS.get(update.message.chat_id, None)
     if not clt:
-        clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=True)
+        clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=False, history_depth=3)
         CLIENTS[update.message.chat_id] = clt
     answer = clt.send_message(update.message.text)
     await update.message.reply_text(answer)
