@@ -1,5 +1,5 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
-from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass, GetOrdersRequest, QueryOrderStatus
+from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass, GetOrdersRequest, QueryOrderStatus, StopLossRequest
 from gemini_investor.alpaca_utils import create_option_ticker, get_option_contract
 
 
@@ -83,8 +83,8 @@ def cancel_order_by_id(order_id: str):
     TradingClientSingleton.get_instance().cancel_order_by_id(order_id=order_id)
 
 
-def buy_stock_by_market_price(symbol: str, qty: int):
-    """Buy a stock at market price, retuns the order id.
+def buy_stock_by_market_price(symbol: str, qty: float):
+    """Buy a stock at market price, retuns the order id. Alpaca allows you to buy shares in parts, not necessarily in whole parts. For example, you can buy/sell 0.5 or 1.8 shares.
     
     Args:
         symbol: The stock symbol to buy.
@@ -102,8 +102,8 @@ def buy_stock_by_market_price(symbol: str, qty: int):
     return market_order.client_order_id
 
 
-def sell_stock_by_market_price(symbol: str, qty: int):
-    """Sell a stock at market price, retuns the order id.
+def sell_stock_by_market_price(symbol: str, qty: float):
+    """Sell a stock at market price, retuns the order id. Alpaca allows you to sell shares in parts, not necessarily in whole parts. For example, you can buy/sell 0.5 or 1.8 shares.
     
     Args:
         symbol: The stock symbol to sell.
@@ -155,9 +155,83 @@ def buy_option_by_limit_price(underlying_symbol, expiration_date, option_type, s
     return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
 
 
-def sell_option_by_limit_price(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price):
+def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
     """
-    Sells an option contract at a specified limit price.
+    Sells an option contract at market price.
+
+    Args:
+        option_ticker (str): The option contract ticker.
+        qty (int): Quantity of the option contract to sell.
+    """
+    market_order_data = MarketOrderRequest(
+        symbol=option_ticker,
+        qty=qty,
+        side=OrderSide.SELL,
+        time_in_force=TimeInForce.DAY,
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
+
+
+def sell_option_by_market_price(underlying_symbol, expiration_date, option_type, strike_price, qty):
+    """
+    Sells an option contract at market price.
+
+    Args:
+        underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
+        expiration_date (str): Expiration date in YYYY-MM-DD format.
+        option_type (str): "C" for call, "P" for put.
+        strike_price (float): Strike price.
+        qty (int): Quantity of the option contract to sell.
+    """
+    option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
+    if not option_contract:
+        return "can not sell, since no suitable owned option contract found."
+    market_order_data = MarketOrderRequest(
+        symbol=option_contract.symbol,
+        qty=qty,
+        side=OrderSide.SELL,
+        time_in_force=TimeInForce.DAY,
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
+
+
+def set_option_exit_strategy_by_option_ticker(option_ticker, qty, limit_price, stop_loss_price):
+    """
+    Sets an exit strategy for an owned option contract.
+
+    Args:
+        option_ticker (str): The option contract ticker.
+        qty (int): Quantity of the option contract to sell.
+        limit_price (float): The limit price at which to sell the option contract.
+        stop_loss_price (float): The stop loss price at which to sell the option contract.
+    """
+    # Check if the option contract is in the portfolio (owned)
+    positions = TradingClientSingleton.get_instance().get_all_positions()
+    owned_option = next((pos for pos in positions if pos.symbol == option_ticker), None)
+    if not owned_option or owned_option.qty < qty:
+        return f"Not enough {option_ticker} contracts owned to sell."
+
+    limit_order_data = LimitOrderRequest(
+        symbol=option_ticker,
+        qty=qty,
+        side=OrderSide.SELL,
+        time_in_force=TimeInForce.DAY,
+        limit_price=limit_price,
+        stop_loss = StopLossRequest(stop_price = stop_loss_price),
+        order_class=OrderClass.SIMPLE,  
+    )
+    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+
+
+def set_option_exit_strategy(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price, stop_loss_price):
+    """
+    Sets an exit strategy for an owned option contract.
 
     Args:
         underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
@@ -166,6 +240,7 @@ def sell_option_by_limit_price(underlying_symbol, expiration_date, option_type, 
         strike_price (float): Strike price.
         qty (int): Quantity of the option contract to sell.
         limit_price (float): The limit price at which to sell the option contract.
+        stop_loss_price (float): The stop loss price at which to sell the option contract.
     """
     option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
     if not option_contract:
@@ -181,9 +256,10 @@ def sell_option_by_limit_price(underlying_symbol, expiration_date, option_type, 
         symbol=option_contract.symbol,
         qty=qty,
         side=OrderSide.SELL,
-        time_in_force=TimeInForce.DAY,
+        time_in_force=TimeInForce.GTC,
         limit_price=limit_price,
-        order_class=OrderClass.SIMPLE,  # For basic options orders
+        stop_loss = StopLossRequest(stop_price = stop_loss_price),
+        order_class=OrderClass.SIMPLE,  
     )
     return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
 
@@ -200,12 +276,15 @@ def get_open_orders():
     return "\n".join([str(order) for order in orders])
 
 
-def get_closed_orders():
+def get_closed_orders(limit=10):
     """Returns a string with the closed orders for the account.
+
+    Args:
+        limit (int): The maximum number of orders to return.
     """
     get_orders_data = GetOrdersRequest(
         status=QueryOrderStatus.CLOSED,
-        limit=100,
+        limit=limit,
         nested=True  # show nested multi-leg orders
     )
     orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)

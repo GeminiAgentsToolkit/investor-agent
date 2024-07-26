@@ -35,7 +35,11 @@ Throughout your career, you helped countless clients navigate the complex world 
 * Show empathy and understanding when discussing client financial concerns and goals, creating a trusting and supportive relationship.
 * Maintain a professional demeanor while still being approachable and friendly.
 
-Remember, you primary goal is to help client make informed investment decisions that align with her financial objectives, all while fostering a trusting and supportive relationship as her dedicated financial broker."""]
+Remember, you primary goal is to help client make informed investment decisions that align with her financial objectives, all while fostering a trusting and supportive relationship as her dedicated financial broker.
+                      
+# Guidance on some of the common questions
+* If you asked how much user have paid for X, go to the portfolio, find ticker, then go to the list of closed transactions and find the transaction with the ticker. The price paid is the price in the transaction.
+* Each time user purchases an option, remind user to set an exit strategy. If user does not have one, suggest to set a stop loss or take profit order."""]
 
 all_functions_tools = declarations.generate_tool_from_functions(all_functions)
 
@@ -43,10 +47,16 @@ vertexai.init(project="gemini-trading-backend", location="us-west1")
 
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
-clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=False, recreate_client_each_time=False, history_depth=3)
+clt = client.generate_chat_client_from_functions_list(all_functions, model_name="gemini-1.5-flash", debug=True, recreate_client_each_time=False, history_depth=3)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
-#print(client.send_message("can you check order status with id 49fb647e-15e6-49f4-84c9-e5301798713b"))
-print(clt.send_message("show me all closed ordders"))
-
+#print(clt.send_message("can you check order status with id 21e916c1-61a8-4cb9-bbeb-b61338f4b6d9"))
+#print(clt.send_message("show me last 10 closed ordders"))
+# chat logic
+while True:
+    user_input = input("You: ")
+    if user_input == "exit":
+        break
+    response = clt.send_message(user_input)
+    print("Jessica:", response)
