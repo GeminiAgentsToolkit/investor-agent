@@ -1,6 +1,8 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
 from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass, GetOrdersRequest, QueryOrderStatus, StopLossRequest
 from gemini_investor.alpaca_utils import create_option_ticker, get_option_contract
+from dateutil import parser
+from datetime import datetime
 
 
 def check_if_trading_is_blocked():
@@ -276,15 +278,43 @@ def get_open_orders():
     return "\n".join([str(order) for order in orders])
 
 
-def get_closed_orders(limit=10):
+def get_closed_orders_in_between_dates(date_from, date_to, limit=30, ticker=None):
+    """Returns a string with the closed orders for the account in between the given dates.
+
+    Args:
+        date_from (str): The start date in YYYY-MM-DD format.
+        date_to (str): The end date in YYYY-MM-DD format.
+        limit (int): The maximum number of orders to return.
+        ticker (str): The stock symbol to filter the orders.
+    """
+    get_orders_data = GetOrdersRequest(
+        status=QueryOrderStatus.CLOSED,
+        after=parser.parse(date_from).timestamp(),
+        until=parser.parse(date_to).timestamp(),
+        limit=limit,
+        symbols=[ticker] if ticker else None,
+        nested=True  # show nested multi-leg orders
+    )
+    orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
+    return "\n".join([str(order) for order in orders])
+
+
+def get_current_date():
+    """Returns the current date in YYYY-MM-DD format."""
+    return datetime.now().strftime("%Y-%m-%d")
+
+
+def get_last_n_closed_orders(limit=10, ticker=None):
     """Returns a string with the closed orders for the account.
 
     Args:
         limit (int): The maximum number of orders to return.
+        ticker (str): The stock symbol to filter the orders.
     """
     get_orders_data = GetOrdersRequest(
         status=QueryOrderStatus.CLOSED,
         limit=limit,
+        symbols=[ticker] if ticker else None,
         nested=True  # show nested multi-leg orders
     )
     orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
