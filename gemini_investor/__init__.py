@@ -5,31 +5,6 @@ from dateutil import parser
 from datetime import datetime
 
 
-def check_if_trading_is_blocked():
-    """Check if trading is blocked for the account"""
-    return f"{TradingClientSingleton.get_instance().get_account().trading_blocked}"
-
-
-def get_account_buying_power():
-    """Returns a string with the number of dollars as the purchasing power of the accountant.
-    Current available cash buying power. If multiplier = 2 then buying_power = max(equity-initial_margin(0) * 2).
-    If multiplier = 1 then buying_power = cash."""
-    return f"{TradingClientSingleton.get_instance().get_account().buying_power}$"
-
-
-def get_non_marginable_buying_power():
-    """Returns a string with the number of dollars as the non marginable buying power for the account."""
-    return f"{TradingClientSingleton.get_instance().get_account().non_marginable_buying_power}$"
-
-
-def get_account_equity_value():
-    """Returns a string with the numbers of dollars that tell us the account equity.
-    This value is cash + long_market_value + short_market_value.
-    This value isn’t calculated in the SDK it is computed on the server and we return the raw value here.
-    """
-    return f"{TradingClientSingleton.get_instance().get_account().equity}$"
-
-
 def buy_option_by_market_price(
         underlying_symbol: str,
         expiration_date: str,
@@ -83,44 +58,6 @@ def cancel_order_by_id(order_id: str):
         order_id: The id of the order to remove.
     """
     TradingClientSingleton.get_instance().cancel_order_by_id(order_id=order_id)
-
-
-def buy_stock_by_market_price(symbol: str, qty: float):
-    """Buy a stock at market price, retuns the order id. Alpaca allows you to buy shares in parts, not necessarily in whole parts. For example, you can buy/sell 0.5 or 1.8 shares.
-    
-    Args:
-        symbol: The stock symbol to buy.
-        qty: The quantity of stock to buy. Mush be a positive integer.
-    """
-    market_order_data = MarketOrderRequest(
-        symbol=symbol,
-        qty=qty,
-        side=OrderSide.BUY,
-        time_in_force=TimeInForce.DAY,
-    )
-    market_order = TradingClientSingleton.get_instance().submit_order(
-        order_data=market_order_data
-    )
-    return market_order.client_order_id
-
-
-def sell_stock_by_market_price(symbol: str, qty: float):
-    """Sell a stock at market price, retuns the order id. Alpaca allows you to sell shares in parts, not necessarily in whole parts. For example, you can buy/sell 0.5 or 1.8 shares.
-    
-    Args:
-        symbol: The stock symbol to sell.
-        qty: The quantity of stock to sell. Mush be a positive integer.
-    """
-    market_order_data = MarketOrderRequest(
-        symbol=symbol,
-        qty=qty,
-        side=OrderSide.SELL,
-        time_in_force=TimeInForce.DAY,
-    )
-    market_order = TradingClientSingleton.get_instance().submit_order(
-        order_data=market_order_data
-    )
-    return market_order.client_order_id
 
 
 def get_portfolio():
@@ -297,11 +234,6 @@ def get_closed_orders_in_between_dates(date_from, date_to, limit=30, ticker=None
     )
     orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
     return "\n".join([str(order) for order in orders])
-
-
-def get_current_date():
-    """Returns the current date in YYYY-MM-DD format."""
-    return datetime.now().strftime("%Y-%m-%d")
 
 
 def get_last_n_closed_orders(limit=10, ticker=None):

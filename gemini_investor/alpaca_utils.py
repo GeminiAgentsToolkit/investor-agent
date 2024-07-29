@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from dateutil import parser
 from zoneinfo import ZoneInfo
-from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus
+from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest
 
 
 # For lazy instantiation
@@ -102,3 +102,46 @@ def create_option_ticker(
     ticker = f"{underlying_symbol}{expiration_str}{option_type.upper()}{strike_str}"
 
     return ticker
+
+
+def submit_market_order(
+        symbol: str, 
+        qty: float, 
+        side: str,
+        *,
+        time_in_force=TimeInForce.DAY):
+    market_order_data = MarketOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=side,
+        time_in_force=time_in_force,
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
+
+
+def submit_limit_order(
+        symbol: str,
+        qty: float,
+        limit_price: float,
+        *,
+        side: str,
+        time_in_force=TimeInForce.GTC,
+        stop_loss_price=-1.):
+    order_class = OrderClass.SIMPLE
+    stop_loss = None
+    if stop_loss_price > 0:
+        order_class = OrderClass.OCO
+        stop_loss = StopLossRequest(stop_price=stop_loss_price)
+    limit_order_data = LimitOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=side,
+        time_in_force=time_in_force,
+        limit_price=limit_price,
+        stop_loss = stop_loss,
+        order_class=order_class,  
+    )
+    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
