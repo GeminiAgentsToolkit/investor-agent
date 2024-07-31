@@ -5,42 +5,6 @@ from dateutil import parser
 from datetime import datetime
 
 
-def buy_option_by_market_price(
-        underlying_symbol: str,
-        expiration_date: str,
-        option_type: str,
-        strike_price: float,
-        qty: int):
-    """Buy an option at market price, retuns the order id.
-
-    Args:
-        underlying_symbol: The underlying symbol of the option.
-        expiration_date: The expiration date of the option.
-        option_type: The type of the option. Should be 'C' (Call) or 'P' (Put).
-        strike_price: The strike price of the option.
-        qty: The quantity of the option to buy. Mush be a positive integer. You MUST provide it, even if qty is 1.
-    """
-    strike_price = float(strike_price)
-    qty = int(qty)
-    option_ticker = create_option_ticker(
-        underlying_symbol=underlying_symbol,
-        expiration_date=expiration_date,
-        option_type=option_type,
-        strike_price=strike_price,
-    )
-    market_order_data = MarketOrderRequest(
-        symbol=option_ticker,
-        qty=qty,
-        side=OrderSide.BUY,
-        time_in_force=TimeInForce.DAY,
-        type=OrderType.MARKET,
-    )
-    market_order = TradingClientSingleton.get_instance().submit_order(
-        order_data=market_order_data
-    )
-    return market_order.client_order_id
-
-
 def get_order_by_id(order_id: str):
     """Returns a string with the order details for the given order id.
     
@@ -65,33 +29,6 @@ def get_portfolio():
     """
     positions = TradingClientSingleton.get_instance().get_all_positions()
     return "\n".join([f"{pos.symbol}: {pos.qty}" for pos in positions if pos.qty != 0])
-
-
-def buy_option_by_limit_price(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price):
-    """
-    Buys an option contract at a specified limit price.
-
-    Args:
-        underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
-        expiration_date (str): Expiration date in YYYY-MM-DD format.
-        option_type (str): "C" for call, "P" for put.
-        strike_price (float): Strike price.
-        qty (int): Quantity of the option contract to buy.
-        limit_price (float): The limit price at which to buy the option contract.
-    """
-    option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
-    if not option_contract:
-        return "No suitable option contract found."
-    
-    limit_order_data = LimitOrderRequest(
-        symbol=option_contract.symbol,
-        qty=qty,
-        side=OrderSide.BUY,
-        time_in_force=TimeInForce.DAY,
-        limit_price=limit_price,
-        order_class=OrderClass.SIMPLE,  # For basic options orders
-    )
-    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
 
 
 def sell_option_by_market_price_with_option_ticker(option_ticker, qty):

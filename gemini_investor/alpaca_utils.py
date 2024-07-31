@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from dateutil import parser
 from zoneinfo import ZoneInfo
-from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest
+from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
 
 
 # For lazy instantiation
@@ -17,7 +17,7 @@ class TradingClientSingleton:
             load_dotenv()  # You can set a path to the .env file
             api_key_id = os.getenv('ALPACA_API_KEY_ID')
             secret_key = os.getenv('ALPACA_SECRET_KEY')
-            cls._instance = TradingClient(api_key_id, secret_key, paper=False)
+            cls._instance = TradingClient(api_key_id, secret_key, paper=True)
         return cls._instance
     
 
@@ -104,17 +104,16 @@ def create_option_ticker(
     return ticker
 
 
-def submit_market_order(
+def submit_sell_market_order(
         symbol: str, 
         qty: float, 
-        side: str,
         *,
         time_in_force=TimeInForce.DAY):
     market_order_data = MarketOrderRequest(
         symbol=symbol,
         qty=qty,
-        side=side,
-        time_in_force=time_in_force,
+        side=OrderSide.SELL,
+        time_in_force=time_in_force
     )
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
@@ -122,26 +121,79 @@ def submit_market_order(
     return market_order.client_order_id
 
 
-def submit_limit_order(
+def submit_market_order(
+        symbol: str, 
+        qty: float,
+        *,
+        time_in_force=TimeInForce.DAY,
+        side: str):
+    market_order_data = MarketOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=side,
+        time_in_force=time_in_force
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
+
+
+def submit_buy_market_order(
+        symbol: str, 
+        qty: float,
+        *,
+        time_in_force=TimeInForce.DAY,
+        take_profit_price: float,
+        stop_loss_price: float):
+    market_order_data = MarketOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=OrderSide.BUY,
+        time_in_force=time_in_force,
+        order_class=OrderClass.BRACKET,
+        take_profit=TakeProfitRequest(limit_price=take_profit_price),
+        stop_loss=StopLossRequest(stop_price=stop_loss_price)
+    )
+    market_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=market_order_data
+    )
+    return market_order.client_order_id
+
+
+def submit_limit_sell_order(
         symbol: str,
         qty: float,
         limit_price: float,
         *,
-        side: str,
-        time_in_force=TimeInForce.GTC,
-        stop_loss_price=-1.):
-    order_class = OrderClass.SIMPLE
-    stop_loss = None
-    if stop_loss_price > 0:
-        order_class = OrderClass.OCO
-        stop_loss = StopLossRequest(stop_price=stop_loss_price)
+        time_in_force=TimeInForce.GTC):
     limit_order_data = LimitOrderRequest(
         symbol=symbol,
         qty=qty,
-        side=side,
+        side=OrderSide.SELL,
+        time_in_force=time_in_force,
+        limit_price=limit_price
+    )
+    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+
+
+
+def submit_limit_buy_order(
+        symbol: str,
+        qty: float,
+        limit_price: float,
+        *,
+        time_in_force=TimeInForce.GTC,
+        take_profit_price: float,
+        stop_loss_price: float):
+    limit_order_data = LimitOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=OrderSide.BUY,
         time_in_force=time_in_force,
         limit_price=limit_price,
-        stop_loss = stop_loss,
-        order_class=order_class,  
+        order_class=OrderClass.BRACKET,
+        take_profit=TakeProfitRequest(limit_price=take_profit_price),
+        stop_loss=StopLossRequest(stop_price=stop_loss_price)
     )
     return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
