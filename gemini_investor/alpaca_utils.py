@@ -17,7 +17,7 @@ class TradingClientSingleton:
             load_dotenv()  # You can set a path to the .env file
             api_key_id = os.getenv('ALPACA_API_KEY_ID')
             secret_key = os.getenv('ALPACA_SECRET_KEY')
-            cls._instance = TradingClient(api_key_id, secret_key, paper=True)
+            cls._instance = TradingClient(api_key_id, secret_key, paper=False)
         return cls._instance
 
 
