@@ -47,7 +47,7 @@ def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return market_order.client_order_id
+    return str(market_order.id)
 
 
 def sell_option_by_market_price(underlying_symbol, expiration_date, option_type, strike_price, qty):
@@ -73,7 +73,7 @@ def sell_option_by_market_price(underlying_symbol, expiration_date, option_type,
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return market_order.client_order_id
+    return str(market_order.id)
 
 
 def set_option_exit_strategy_by_option_ticker(option_ticker, qty, limit_price, stop_loss_price):
@@ -101,7 +101,7 @@ def set_option_exit_strategy_by_option_ticker(option_ticker, qty, limit_price, s
         stop_loss = StopLossRequest(stop_price = stop_loss_price),
         order_class=OrderClass.SIMPLE,  
     )
-    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+    return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 
 
 def set_option_exit_strategy(underlying_symbol, expiration_date, option_type, strike_price, qty, limit_price, stop_loss_price):
@@ -136,7 +136,7 @@ def set_option_exit_strategy(underlying_symbol, expiration_date, option_type, st
         stop_loss = StopLossRequest(stop_price = stop_loss_price),
         order_class=OrderClass.SIMPLE,  
     )
-    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+    return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 
 
 def get_open_orders():

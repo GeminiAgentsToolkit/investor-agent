@@ -17,7 +17,7 @@ class TradingClientSingleton:
             load_dotenv()  # You can set a path to the .env file
             api_key_id = os.getenv('ALPACA_API_KEY_ID')
             secret_key = os.getenv('ALPACA_SECRET_KEY')
-            cls._instance = TradingClient(api_key_id, secret_key, paper=False)
+            cls._instance = TradingClient(api_key_id, secret_key, paper=True)
         return cls._instance
 
 
@@ -77,7 +77,7 @@ def submit_sell_market_order(
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return market_order.client_order_id
+    return str(market_order.id)
 
 
 def submit_market_order(
@@ -95,7 +95,7 @@ def submit_market_order(
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return market_order.client_order_id
+    return str(market_order.id)
 
 
 def submit_buy_market_order(
@@ -117,7 +117,7 @@ def submit_buy_market_order(
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return market_order.client_order_id
+    return (market_order.id)
 
 
 def submit_limit_sell_order(
@@ -133,7 +133,8 @@ def submit_limit_sell_order(
         time_in_force=time_in_force,
         limit_price=limit_price
     )
-    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+    order = TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data)
+    return str(order.id)
 
 
 
@@ -155,4 +156,4 @@ def submit_limit_buy_order(
         take_profit=TakeProfitRequest(limit_price=take_profit_price),
         stop_loss=StopLossRequest(stop_price=stop_loss_price)
     )
-    return TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).client_order_id
+    return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
