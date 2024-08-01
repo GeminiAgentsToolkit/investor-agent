@@ -1,8 +1,7 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
 from alpaca.trading.requests import MarketOrderRequest, OrderSide, TimeInForce, OrderType, LimitOrderRequest, OrderClass, GetOrdersRequest, QueryOrderStatus, StopLossRequest
-from gemini_investor.alpaca_utils import create_option_ticker, get_option_contract
+from gemini_investor.options_calls import get_option_contract
 from dateutil import parser
-from datetime import datetime
 
 
 def get_order_by_id(order_id: str):
@@ -178,7 +177,7 @@ def get_last_n_closed_orders(limit=10, ticker=None):
 
     Args:
         limit (int): The maximum number of orders to return.
-        ticker (str): The stock symbol to filter the orders.
+        ticker (str): The stock symbol or part of option symbol to filter the orders. This is an optional parameter.
     """
     get_orders_data = GetOrdersRequest(
         status=QueryOrderStatus.CLOSED,
