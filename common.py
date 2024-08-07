@@ -1,7 +1,6 @@
 import gemini_investor.generic_calls
 import gemini_investor.options_calls
 import gemini_investor.stock_calls
-from gemini_toolbox import declarations
 import gemini_investor
 import inspect
 

@@ -1,5 +1,9 @@
 from gemini_investor.alpaca_utils import TradingClientSingleton
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
+
+import psutil
+import socket
 
 
 def check_if_trading_is_blocked():
@@ -30,3 +34,18 @@ def get_account_equity_value():
 def get_current_date():
     """Returns the current date in YYYY-MM-DD format."""
     return datetime.now().strftime("%Y-%m-%d")
+
+
+def get_system_info():
+    """Returns a string with the system information.
+    This includes the container ID, the current date, and the uptime of the container
+    """
+    # Get the container ID from the hostname
+    container_id = socket.gethostname()
+    boot_time = psutil.boot_time()
+    uptime_seconds = time.time() - boot_time
+    uptime_string = str(timedelta(seconds = uptime_seconds))
+
+    return f"""Container ID: {container_id}
+current date: {get_current_date()}
+Uptime: {uptime_string}"""

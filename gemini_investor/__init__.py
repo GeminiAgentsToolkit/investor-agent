@@ -94,11 +94,11 @@ def set_option_exit_strategy_by_option_ticker(option_ticker, qty, limit_price, s
 
     limit_order_data = LimitOrderRequest(
         symbol=option_ticker,
-        qty=qty,
+        qty=int(qty),
         side=OrderSide.SELL,
         time_in_force=TimeInForce.DAY,
-        limit_price=limit_price,
-        stop_loss = StopLossRequest(stop_price = stop_loss_price),
+        limit_price=float(limit_price),
+        stop_loss=StopLossRequest(stop_price = float(stop_loss_price)),
         order_class=OrderClass.SIMPLE,  
     )
     return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
@@ -129,17 +129,17 @@ def set_option_exit_strategy(underlying_symbol, expiration_date, option_type, st
 
     limit_order_data = LimitOrderRequest(
         symbol=option_contract.symbol,
-        qty=qty,
+        qty=int(qty),
         side=OrderSide.SELL,
         time_in_force=TimeInForce.GTC,
-        limit_price=limit_price,
-        stop_loss = StopLossRequest(stop_price = stop_loss_price),
+        limit_price=float(limit_price),
+        stop_loss = StopLossRequest(stop_price = float(stop_loss_price)),
         order_class=OrderClass.SIMPLE,  
     )
     return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 
 
-def get_open_orders():
+def get_100_latest_open_orders():
     """Returns a string with the open orders for the account.
     """
     get_orders_data = GetOrdersRequest(

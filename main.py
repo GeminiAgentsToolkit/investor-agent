@@ -6,8 +6,12 @@ from vertexai.generative_models import (
 from gemini_toolbox import client
 import gemini_investor
 import common
+from google.oauth2 import service_account
 
-vertexai.init(project="gemini-trading-backend", location="us-west1")
+credentials = service_account.Credentials.from_service_account_file(
+    './sa.json')
+
+vertexai.init(project="gemini-trading-backend", location="us-west1", credentials=credentials)
 
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
