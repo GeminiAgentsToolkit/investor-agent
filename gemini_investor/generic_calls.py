@@ -23,6 +23,23 @@ def get_non_marginable_buying_power():
     return f"{TradingClientSingleton.get_instance().get_account().non_marginable_buying_power}$"
 
 
+def is_account_paper_or_prod():
+    """Returns a string with the account type. Either paper or prod."""
+    return "paper" if TradingClientSingleton.is_paper() else "prod"
+
+
+def switch_to_prod_account():
+    """Switches the account to a paper account."""
+    TradingClientSingleton.switch_to_prod_account()
+    return "done"
+
+
+def switch_to_paper_account():
+    """Switches the account to a paper account."""
+    TradingClientSingleton.switch_to_paper_account()
+    return "done"
+
+
 def get_account_equity_value():
     """Returns a string with the numbers of dollars that tell us the account equity.
     This value is cash + long_market_value + short_market_value.

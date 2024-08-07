@@ -9,16 +9,42 @@ from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, Mark
 
 # For lazy instantiation
 class TradingClientSingleton:
-    _instance = None
+    _instance_prod = None
+    _instance_paper = None
+    _paper = False
+
+    @classmethod
+    def is_paper(cls):
+        return cls._paper
+    
+    @classmethod
+    def switch_to_paper_account(cls):
+        cls._paper = True
+    
+    @classmethod
+    def switch_to_prod_account(cls):
+        cls._paper = False
 
     @classmethod
     def get_instance(cls):
-        if cls._instance is None:
-            load_dotenv()  # You can set a path to the .env file
-            api_key_id = os.getenv('ALPACA_API_KEY_ID')
-            secret_key = os.getenv('ALPACA_SECRET_KEY')
-            cls._instance = TradingClient(api_key_id, secret_key, paper=False)
-        return cls._instance
+        if not cls._paper:
+            if cls._instance_prod is not None:
+                return cls._instance_prod
+            else:
+                load_dotenv(".env.prod", override=True)
+                api_key_id = os.getenv('ALPACA_API_KEY_ID')
+                secret_key = os.getenv('ALPACA_SECRET_KEY')
+                cls._instance_prod = TradingClient(api_key_id, secret_key, paper=cls._paper)
+                return cls._instance_prod
+        else:
+            if cls._instance_paper is not None:
+                return cls._instance_paper
+            else:
+                load_dotenv(".env.dev", override=True)
+                api_key_id = os.getenv('ALPACA_API_KEY_ID')
+                secret_key = os.getenv('ALPACA_SECRET_KEY')
+                cls._instance_paper = TradingClient(api_key_id, secret_key, paper=cls._paper)
+                return cls._instance_paper
 
 
 def create_option_ticker(
