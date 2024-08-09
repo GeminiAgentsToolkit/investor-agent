@@ -179,12 +179,17 @@ def get_last_n_closed_orders(limit=10, ticker=None):
         limit (int): The maximum number of orders to return.
         ticker (str): The stock symbol or part of option symbol to filter the orders. This is an optional parameter.
     """
+    if ticker:
+        limit = 100
     get_orders_data = GetOrdersRequest(
         status=QueryOrderStatus.CLOSED,
         limit=limit,
-        symbols=[ticker] if ticker else None,
+        symbols=None,
         nested=True  # show nested multi-leg orders
     )
     orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
+    if ticker:
+        # check low casae ticker in lowcase symbol
+        orders = [order for order in orders if ticker.lower() in order.symbol.lower()]
     return "\n".join([str(order) for order in orders])
 
