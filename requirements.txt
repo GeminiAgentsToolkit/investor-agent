@@ -4,3 +4,5 @@ python-dotenv==1.0.1
 python-telegram-bot==20.6
 python-dateutil==2.9.0.post0
 psutil==6.0.0
+pytz==2024.1
+google-cloud-logging==3.11.1

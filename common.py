@@ -1,8 +1,20 @@
 import gemini_investor.generic_calls
 import gemini_investor.options_calls
+import gemini_investor.order_calls
 import gemini_investor.stock_calls
 import gemini_investor
 import inspect
+import google.cloud.logging
+
+from google.oauth2 import service_account
+
+
+GCP_PROJECT = "gemini-trading-backend"
+GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
+    './sa.json')
+
+logging_client = google.cloud.logging.Client(project=GCP_PROJECT, credentials=GCP_CREDENTAILS)
+logging_client.setup_logging()
 
 
 all_functions = [
@@ -17,6 +29,9 @@ all_functions = [
                 ] + [
                     func
                     for name, func in inspect.getmembers(gemini_investor.options_calls, inspect.isfunction)
+                ] + [
+                    func
+                    for name, func in inspect.getmembers(gemini_investor.order_calls, inspect.isfunction)
                 ]
 
 system_instruction = ["""

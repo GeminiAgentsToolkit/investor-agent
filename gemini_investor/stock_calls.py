@@ -1,5 +1,5 @@
 from gemini_investor.alpaca_utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
-from alpaca.trading.requests import OrderSide, TimeInForce
+from alpaca.trading.requests import TimeInForce
 
 
 def buy_stock_by_market_price(symbol: str, qty: float, take_profit_price: float, stop_loss_price: float):

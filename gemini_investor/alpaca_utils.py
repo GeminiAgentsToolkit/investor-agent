@@ -1,9 +1,10 @@
 from alpaca.trading.client import TradingClient
+from gemini_investor.common import parse_date
 import os
 from dotenv import load_dotenv
 from datetime import datetime
 from dateutil import parser
-from zoneinfo import ZoneInfo
+import pytz
 from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
 
 
@@ -63,11 +64,9 @@ def create_option_ticker(
 
     # --- Validate Expiration Date ---
     try:
-        expiration_datetime = parser.parse(expiration_date)
+        expiration_datetime = parse_date(expiration_date)
     except ValueError:
         raise ValueError("Invalid expiration date format: should be YYYY-MM-DD")
-    if expiration_datetime < datetime.now():
-        raise ValueError("Expiration date cannot be in the past")
 
     # --- Validate Option Type ---
     if option_type.upper() not in ("C", "P"):
@@ -161,7 +160,6 @@ def submit_limit_sell_order(
     )
     order = TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data)
     return str(order.id)
-
 
 
 def submit_limit_buy_order(
