@@ -1,7 +1,5 @@
-from gemini_investor.alpaca_utils import TradingClientSingleton, create_option_ticker, submit_market_order
-from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus, MarketOrderRequest
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from gemini_investor.alpaca_utils import TradingClientSingleton, create_option_ticker, submit_market_order, create_option_ticker
+from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus
 from gemini_investor.alpaca_utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
 from gemini_investor.common import now
     
@@ -94,10 +92,8 @@ def sell_option_by_market_price(underlying_symbol, expiration_date, option_type,
         strike_price (float): Strike price.
         qty (int): Quantity of the option contract to sell.
     """
-    option_contract = get_option_contract(underlying_symbol, option_type, expiration_date, strike_price)
-    if not option_contract:
-        return "can not sell, since no suitable owned option contract found."
-    return sell_option_by_market_price_with_option_ticker(option_contract.symbol, qty)
+    symbol = create_option_ticker(underlying_symbol, expiration_date, option_type, strike_price)
+    return sell_option_by_market_price_with_option_ticker(symbol, qty)
 
 
 def sell_option_by_limit_price(option_ticker, qty, limit_price):
