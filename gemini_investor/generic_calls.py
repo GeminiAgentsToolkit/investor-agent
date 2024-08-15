@@ -11,16 +11,16 @@ def check_if_trading_is_blocked():
     return f"{TradingClientSingleton.get_instance().get_account().trading_blocked}"
 
 
-# def get_account_buying_power():
-#     """Returns a string with the number of dollars as the purchasing power of the accountant.
-#     Current available cash buying power. If multiplier = 2 then buying_power = max(equity-initial_margin(0) * 2).
-#     If multiplier = 1 then buying_power = cash."""
-#     return f"{TradingClientSingleton.get_instance().get_account().buying_power}$"
+def get_account_buying_power():
+    """Returns a string with the number of dollars as the purchasing power of the accountant.
+    Current available cash buying power. If multiplier = 2 then buying_power = max(equity-initial_margin(0) * 2).
+    If multiplier = 1 then buying_power = cash."""
+    return f"{TradingClientSingleton.get_instance().get_account().buying_power}$"
 
 
-def get_non_marginable_buying_power():
-    """Returns a string with the number of dollars as the non marginable buying power for the account."""
-    return f"{TradingClientSingleton.get_instance().get_account().non_marginable_buying_power}$"
+# def get_non_marginable_buying_power():
+#     """Returns a string with the number of dollars as the non marginable buying power for the account."""
+#     return f"{TradingClientSingleton.get_instance().get_account().non_marginable_buying_power}$"
 
 
 def is_account_paper_or_prod():
