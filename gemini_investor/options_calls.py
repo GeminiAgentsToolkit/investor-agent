@@ -2,7 +2,13 @@ from gemini_investor.alpaca_utils import TradingClientSingleton, create_option_t
 from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus
 from gemini_investor.alpaca_utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
 from gemini_investor.common import now
-    
+
+
+"""
+This module exclusively handles option contracts for stocks. 
+These functions are not designed to work with stocks directly.
+"""
+
 
 def get_option_contract(underlying_symbol, option_type, expiration_date=None, strike_price=None, min_open_interest=0):
     """
@@ -72,7 +78,7 @@ def buy_option_by_market_price(
 
 def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
     """
-    Sells an option contract at market price.
+    Sells an option contract at the market price, using the option ticker.
 
     Args:
         option_ticker (str): The option contract ticker.
@@ -83,7 +89,7 @@ def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
 
 def sell_option_by_market_price(underlying_symbol, expiration_date, option_type, strike_price, qty):
     """
-    Sells an option contract at market price.
+    Sells an option contract at the market price, using a ticker from the underlying asset.
 
     Args:
         underlying_symbol (str): The underlying stock symbol (e.g., AAPL).
@@ -98,7 +104,8 @@ def sell_option_by_market_price(underlying_symbol, expiration_date, option_type,
 
 def sell_option_by_limit_price(option_ticker, qty, limit_price):
     """
-    Sets an exit strategy for an owned option contract.
+    Sets the upper profit limit of the exit strategy from the existing option contract.
+    Cannot be used for Stop-Loss exit strategy.
 
     Args:
         option_ticker (str): The option contract ticker.
