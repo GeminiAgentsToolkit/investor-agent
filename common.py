@@ -6,8 +6,15 @@ import gemini_investor
 import inspect
 import google.cloud.logging
 
+from dotenv import load_dotenv
+import os
+import google.generativeai as genai
+from gemini_toolbox import client
+
 from google.oauth2 import service_account
 
+
+MODEL_NAME="gemini-1.5-pro"
 
 GCP_PROJECT = "gemini-trading-backend"
 GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
@@ -55,3 +62,11 @@ Do not overload the user with excessive trading knowledge. You are a tool for pr
 Do not spend effort on anything unrelated to trading and trading strategy forecasting.
 
 """]
+
+
+def create_client(user_id):
+    load_dotenv()
+    genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+
+    return client.generate_chat_client_from_functions_list(all_functions, model_name=MODEL_NAME, debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=system_instruction, do_not_die=True, add_scheduling_functions=True, gcs_bucket="gemini_jobs", gcs_blob=f"jobs_{user_id}.json")
+

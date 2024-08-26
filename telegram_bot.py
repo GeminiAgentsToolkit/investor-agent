@@ -11,14 +11,6 @@ load_dotenv()
 chat_ids = [str(id) for id in os.getenv('TELEGRAM_CHAT_IDS').split(',')]
 telegram_token = os.getenv('TELEGRAM_TOKEN')
 
-from gemini_toolbox import client
-import gemini_investor
-
-from google.oauth2 import service_account
-
-load_dotenv()
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-
 CLIENTS = {
 }
 
@@ -33,7 +25,7 @@ async def message(update, context):
         return
     clt = CLIENTS.get(update.message.chat_id, None)
     if not clt:
-        clt = client.generate_chat_client_from_functions_list(common.all_functions, model_name="gemini-1.5-pro", debug=False, recreate_client_each_time=False, history_depth=4, system_instruction=common.system_instruction, do_not_die=True)        
+        clt = common.create_client(str(update.message.chat_id))
         CLIENTS[update.message.chat_id] = clt
     answer = clt.send_message(update.message.text)
     await update.message.reply_text(answer)

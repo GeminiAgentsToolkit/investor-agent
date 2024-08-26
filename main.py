@@ -12,7 +12,7 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
-clt = client.generate_chat_client_from_functions_list(common.all_functions, model_name="gemini-1.5-pro", debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=common.system_instruction, do_not_die=True)
+clt = common.create_client("local")
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
