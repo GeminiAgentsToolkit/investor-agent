@@ -64,9 +64,12 @@ Do not spend effort on anything unrelated to trading and trading strategy foreca
 """]
 
 
-def create_client(user_id):
+def create_client(user_id, function_to_send_message):
     load_dotenv()
     genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
-    return client.generate_chat_client_from_functions_list(all_functions, model_name=MODEL_NAME, debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=system_instruction, do_not_die=True, add_scheduling_functions=True, gcs_bucket="gemini_jobs", gcs_blob=f"jobs_{user_id}.json")
+    copy_of_all_functions = all_functions.copy()
+    copy_of_all_functions.append(function_to_send_message) 
+
+    return client.generate_chat_client_from_functions_list(copy_of_all_functions, model_name=MODEL_NAME, debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=system_instruction, do_not_die=True, add_scheduling_functions=True, gcs_bucket="gemini_jobs", gcs_blob=f"jobs_{user_id}.json")
 

@@ -12,7 +12,12 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
-clt = common.create_client("local")
+
+def send_msg_to_user(msg: str):
+    """Send a message to the user. Use this function to send messages to the user, not just return text string. Text string that you generate(that is not passed to this function) can be random. User will not see it."""
+    print(msg)
+
+clt = common.create_client("local", send_msg_to_user)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))
