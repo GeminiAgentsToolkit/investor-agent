@@ -10,7 +10,12 @@ These functions are not designed to work with stocks directly.
 """
 
 
-def get_option_contract(underlying_symbol, option_type, expiration_date=None, strike_price=None, min_open_interest=0):
+def get_option_contract(
+        underlying_symbol: str, 
+        option_type: str, 
+        expiration_date: str = None, 
+        strike_price: float = None, 
+        min_open_interest: int = 0):
     """
     Fetches an information option contract matching the given criteria.
 
@@ -76,7 +81,8 @@ def buy_option_by_market_price(
     return submit_market_order(option_ticker, qty, time_in_force=TimeInForce.DAY, side=OrderSide.BUY)
 
 
-def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
+def sell_option_by_market_price_with_option_ticker(
+        option_ticker: str, qty: int):
     """
     Sells an option contract at the market price, using the option ticker.
 
@@ -87,7 +93,12 @@ def sell_option_by_market_price_with_option_ticker(option_ticker, qty):
     return submit_sell_market_order(option_ticker, qty)
 
 
-def sell_option_by_market_price(underlying_symbol, expiration_date, option_type, strike_price, qty):
+def sell_option_by_market_price(
+        underlying_symbol: str, 
+        expiration_date: str, 
+        option_type: str, 
+        strike_price: float, 
+        qty: int):
     """
     Sells an option contract at the market price, using a ticker from the underlying asset.
 
@@ -102,7 +113,10 @@ def sell_option_by_market_price(underlying_symbol, expiration_date, option_type,
     return sell_option_by_market_price_with_option_ticker(symbol, qty)
 
 
-def sell_option_by_limit_price(option_ticker, qty, limit_price):
+def sell_option_by_limit_price(
+        option_ticker: str, 
+        qty: int, 
+        limit_price: float):
     """
     Sets the upper profit limit of the exit strategy from the existing option contract.
     Cannot be used for Stop-Loss exit strategy.

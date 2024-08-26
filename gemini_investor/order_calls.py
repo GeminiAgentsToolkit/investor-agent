@@ -35,7 +35,7 @@ def get_100_latest_open_orders():
     return "\n".join([str(order) for order in orders])
 
 
-def get_closed_orders_in_between_dates(date_from, date_to, limit=30, ticker=None):
+def get_closed_orders_in_between_dates(date_from: str, date_to: str, limit: int = 30, ticker: str = None):
     """Returns a string with the closed orders for the account in between the given dates.
 
     Args:
@@ -56,7 +56,7 @@ def get_closed_orders_in_between_dates(date_from, date_to, limit=30, ticker=None
     return "\n".join([str(order) for order in orders])
 
 
-def get_last_n_closed_orders(limit=10, ticker=None):
+def get_last_n_closed_orders(limit: int = 10, ticker: str =None):
     """Returns a string with the closed orders for the account.
 
     Args:

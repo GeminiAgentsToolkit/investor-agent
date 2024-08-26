@@ -19,19 +19,24 @@ logging_client.setup_logging()
 
 all_functions = [
                     func
-                    for name, func in inspect.getmembers(gemini_investor, inspect.isfunction)
+                    for _, func in inspect.getmembers(gemini_investor.options_calls)
+                    if inspect.isfunction(func) and func.__module__ == gemini_investor.options_calls.__name__
                 ] + [
                     func
-                    for name, func in inspect.getmembers(gemini_investor.generic_calls, inspect.isfunction)
+                    for _, func in inspect.getmembers(gemini_investor, inspect.isfunction)
+                    if inspect.isfunction(func) and func.__module__ == gemini_investor.__name__
                 ] + [
                     func
-                    for name, func in inspect.getmembers(gemini_investor.stock_calls, inspect.isfunction)
+                    for _, func in inspect.getmembers(gemini_investor.generic_calls, inspect.isfunction)
+                    if inspect.isfunction(func) and func.__module__ == gemini_investor.generic_calls.__name__
                 ] + [
                     func
-                    for name, func in inspect.getmembers(gemini_investor.options_calls, inspect.isfunction)
+                    for _, func in inspect.getmembers(gemini_investor.stock_calls, inspect.isfunction)
+                    if inspect.isfunction(func) and func.__module__ == gemini_investor.stock_calls.__name__
                 ] + [
                     func
-                    for name, func in inspect.getmembers(gemini_investor.order_calls, inspect.isfunction)
+                    for _, func in inspect.getmembers(gemini_investor.order_calls, inspect.isfunction)
+                    if inspect.isfunction(func) and func.__module__ == gemini_investor.order_calls.__name__
                 ]
 
 system_instruction = ["""

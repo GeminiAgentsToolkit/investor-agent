@@ -1,18 +1,18 @@
-import vertexai
 import inspect
-from vertexai.generative_models import (
-    GenerativeModel,
-)
+from dotenv import load_dotenv
+import os
+import google.generativeai as genai
 from gemini_toolbox import client
 import gemini_investor
 import common
 
+load_dotenv()
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
-# vertexai.init(project="gemini-trading-backend", location="us-west1")
-vertexai.init(project=common.GCP_PROJECT, location="us-west1", credentials=common.GCP_CREDENTAILS)
+
 # model = GenerativeModel(model_name="gemini-1.5-flash", tools=[all_functions_tools], system_instruction=system_instruction)
 # client = client.GeminiChatClient(all_functions, model, debug=True)
-clt = client.generate_chat_client_from_functions_list(common.all_functions, model_name="gemini-1.5-flash", debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=common.system_instruction, do_not_die=True)
+clt = client.generate_chat_client_from_functions_list(common.all_functions, model_name="gemini-1.5-pro", debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=common.system_instruction, do_not_die=True)
 
 #print(client.send_message("can you sell my one SPY call, strike 549, for 8/23/24 by limit price 100$"))
 #print(client.send_message("can you cancel order iwth id 550e8400-e29b-41d4-a716-446655440000"))

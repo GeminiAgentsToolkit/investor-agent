@@ -10,5 +10,5 @@ def now():
     return datetime.now(tz=NASDAQ_TZ)
 
 
-def parse_date(date_str):
+def parse_date(date_str: str):
     return parser.parse(date_str, tzinfos={'': NASDAQ_TZ})
