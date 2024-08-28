@@ -12,9 +12,9 @@ def check_if_trading_is_blocked():
 
 
 def get_account_buying_power():
-    """Returns a string with the number of dollars as the purchasing power of the accountant.
-    Current available cash buying power. If multiplier = 2 then buying_power = max(equity-initial_margin(0) * 2).
-    If multiplier = 1 then buying_power = cash."""
+    """
+    Returns only cash buying power at this moment.
+    """
     return f"{TradingClientSingleton.get_instance().get_account().buying_power}$"
 
 
@@ -41,9 +41,11 @@ def switch_to_paper_account():
 
 
 def get_account_equity_value():
-    """Returns a string with the numbers of dollars that tell us the account equity.
-    This value is cash + long_market_value + short_market_value.
-    This value calculated on the server and we return the raw value here.
+    """
+    This function shows the cost of the Alpaca account. This function answers the following questions:
+        - what is the cost of the account?
+        - what is my value now?
+    The questions may be similar to those above
     """
     return f"{TradingClientSingleton.get_instance().get_account().equity}$"
 
