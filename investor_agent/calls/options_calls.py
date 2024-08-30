@@ -1,6 +1,6 @@
 from investor_agent.utils import TradingClientSingleton, create_option_ticker, submit_market_order, create_option_ticker
 from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus
-from investor_agent.utils import submit_limit_sell_order, submit_sell_market_order
+from investor_agent.utils import submit_limit_sell_order, submit_sell_market_order, submit_stop_limit_sell_order
 from investor_agent.utils.common import now
 
 
@@ -129,3 +129,20 @@ def sell_option_by_limit_price(
     qty = int(qty)
     limit_price = float(limit_price)
     return submit_limit_sell_order(option_ticker, qty, limit_price, time_in_force=TimeInForce.DAY)
+
+def set_stop_limit_price(
+        option_ticker: str,
+        qty: int,
+        stop_price: float,
+        limit_price: float):
+    """
+    Sets the stop loss price trigger and limit price for the exit strategy from the existing option contract.
+    Cannot be used for a limit exit strategy.
+
+    Args:
+        option_ticker (str): The ticker symbol of the option contract.
+        qty (int): The number of option contracts to sell.
+        stop_price (float): The price at which the stop order will be triggered.
+        limit_price (float): The limit price at which to sell the option contract.
+    """
+    return submit_stop_limit_sell_order(option_ticker, qty, stop_price, limit_price, time_in_force=TimeInForce.DAY)

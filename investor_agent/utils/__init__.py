@@ -183,33 +183,20 @@ def submit_limit_buy_order(
     return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 
 
-def submit_stop_loss_order(
-    symbol: str,
-    qty: float,
-    stop_price: float,
-    *,
-    time_in_force=TimeInForce.GTC,
+def submit_stop_limit_sell_order(
+        symbol: str,
+        qty: float,
+        stop_price: float,
+        limit_price: float,
+        *,
+        time_in_force=TimeInForce.GTC,
 ):
-    """
-    Submits a stop-loss order for an existing position.
-
-    Args:
-        symbol (str): The symbol of the asset.
-        qty (float): The quantity of the asset.
-        stop_price (float): The stop price to trigger the order.
-        time_in_force (TimeInForce, optional): The time in force for the order. Defaults to TimeInForce.GTC.
-
-    Returns:
-        str: The order ID of the submitted stop-loss order.
-    """
-
-    stop_loss_order_data = StopLossRequest(
+    stop_limit_order_data = StopLimitOrderRequest(
         symbol=symbol,
         qty=qty,
-        side=OrderSide.SELL,  # Stop-loss orders are typically sell orders
+        side=OrderSide.SELL,
         time_in_force=time_in_force,
         stop_price=stop_price,
+        limit_price=limit_price
     )
-
-    order = TradingClientSingleton.get_instance().submit_order(order_data=stop_loss_order_data)
-    return str(order.id)
+    return str(TradingClientSingleton.get_instance().submit_order(order_data=stop_limit_order_data).id)
