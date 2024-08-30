@@ -1,7 +1,6 @@
 
 from tabulate import tabulate
 from investor_agent.utils import TradingClientSingleton
-from investor_agent.options_calls import get_option_contract
 
 
 def get_portfolio():

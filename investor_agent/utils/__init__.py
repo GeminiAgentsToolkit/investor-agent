@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from dateutil import parser
 import pytz
-from alpaca.trading.requests import GetOptionContractsRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
+from alpaca.trading.requests import StopLimitOrderRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
 
 
 # For lazy instantiation
