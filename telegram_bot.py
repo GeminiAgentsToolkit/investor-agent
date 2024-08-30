@@ -32,8 +32,8 @@ async def message(update, context):
     if not clt:
         clt = common.create_client(str(update.message.chat_id), generate_client_function(str(update.message.chat_id)))
         CLIENTS[update.message.chat_id] = clt
-    answer = clt.send_message(update.message.text)
-    await update.message.reply_text(answer)
+    clt.send_message(update.message.text)
+    # await update.message.reply_text(answer)
 
 
 async def get_chat_id(update, context):

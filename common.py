@@ -6,15 +6,16 @@ import gemini_investor
 import inspect
 import google.cloud.logging
 
-from dotenv import load_dotenv
-import os
-import google.generativeai as genai
-from gemini_toolbox import client
-
+from gemini_agents_toolkit import agent
 from google.oauth2 import service_account
 
+import vertexai
 
-MODEL_NAME="gemini-1.5-pro"
+
+vertexai.init(project="gemini-trading-backend", location="us-west1")
+
+
+MODEL_NAME="gemini-1.5-flash"
 
 GCP_PROJECT = "gemini-trading-backend"
 GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
@@ -64,12 +65,15 @@ Do not spend effort on anything unrelated to trading and trading strategy foreca
 """]
 
 
-def create_client(user_id, function_to_send_message):
-    load_dotenv()
-    genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-
-    copy_of_all_functions = all_functions.copy()
-    copy_of_all_functions.append(function_to_send_message) 
-
-    return client.generate_chat_client_from_functions_list(copy_of_all_functions, model_name=MODEL_NAME, debug=True, recreate_client_each_time=False, history_depth=4, system_instruction=system_instruction, do_not_die=True, add_scheduling_functions=True, gcs_bucket="gemini_jobs", gcs_blob=f"jobs_{user_id}.json")
+def create_client(user_id, on_message_received):
+    return agent.create_agent_from_functions_list(
+         functions=all_functions, 
+         model_name=MODEL_NAME, 
+         debug=True, 
+         history_depth=4, 
+         system_instruction=system_instruction, 
+         add_scheduling_functions=True, 
+         gcs_bucket="gemini_jobs", 
+         gcs_blob=f"jobs_{user_id}.json",
+         on_message=on_message_received)
 
