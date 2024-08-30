@@ -1,5 +1,5 @@
 from alpaca.trading.client import TradingClient
-from gemini_investor.common import parse_date
+from investor_agent.utils.common import parse_date
 import os
 from dotenv import load_dotenv
 from datetime import datetime

@@ -1,4 +1,4 @@
-from gemini_investor.alpaca_utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
+from investor_agent.utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
 from alpaca.trading.requests import TimeInForce
 
 

@@ -1,7 +1,7 @@
-from gemini_investor.alpaca_utils import TradingClientSingleton, create_option_ticker, submit_market_order, create_option_ticker
+from investor_agent.utils import TradingClientSingleton, create_option_ticker, submit_market_order, create_option_ticker
 from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus
-from gemini_investor.alpaca_utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
-from gemini_investor.common import now
+from investor_agent.utils import submit_limit_sell_order, submit_sell_market_order
+from investor_agent.utils.common import now
 
 
 """

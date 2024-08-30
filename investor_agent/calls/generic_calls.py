@@ -1,4 +1,4 @@
-from gemini_investor.alpaca_utils import TradingClientSingleton
+from investor_agent.utils import TradingClientSingleton
 from datetime import datetime, timedelta
 import time
 

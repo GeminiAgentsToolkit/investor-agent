@@ -1,5 +1,5 @@
-from gemini_investor.alpaca_utils import TradingClientSingleton
-from gemini_investor.common import parse_date
+from investor_agent.utils import TradingClientSingleton
+from investor_agent.utils import parse_date
 from alpaca.trading.requests import GetOrdersRequest, QueryOrderStatus
 from dateutil import parser
 
