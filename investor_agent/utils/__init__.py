@@ -2,10 +2,7 @@ from alpaca.trading.client import TradingClient
 from investor_agent.utils.common import parse_date
 import os
 from dotenv import load_dotenv
-from datetime import datetime
-from dateutil import parser
-import pytz
-from alpaca.trading.requests import StopLimitOrderRequest, AssetStatus, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
+from alpaca.trading.requests import StopLimitOrderRequest, StopOrderRequest, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
 
 
 # For lazy instantiation
@@ -17,11 +14,11 @@ class TradingClientSingleton:
     @classmethod
     def is_paper(cls):
         return cls._paper
-    
+
     @classmethod
     def switch_to_paper_account(cls):
         cls._paper = True
-    
+
     @classmethod
     def switch_to_prod_account(cls):
         cls._paper = False
@@ -80,7 +77,7 @@ def create_option_ticker(
     expiration_str = expiration_datetime.strftime("%y%m%d")
 
     # --- Format Strike Price ---
-    strike_str = f"{int(strike_price * 1000):08}" 
+    strike_str = f"{int(strike_price * 1000):08}"
 
     # --- Create Ticker ---
     ticker = f"{underlying_symbol}{expiration_str}{option_type.upper()}{strike_str}"
@@ -89,10 +86,10 @@ def create_option_ticker(
 
 
 def submit_sell_market_order(
-        symbol: str, 
-        qty: float, 
-        *,
-        time_in_force=TimeInForce.DAY):
+    symbol: str,
+    qty: float,
+    *,
+    time_in_force=TimeInForce.DAY):
     market_order_data = MarketOrderRequest(
         symbol=symbol,
         qty=qty,
@@ -106,11 +103,11 @@ def submit_sell_market_order(
 
 
 def submit_market_order(
-        symbol: str, 
-        qty: float,
-        *,
-        time_in_force=TimeInForce.DAY,
-        side: str):
+    symbol: str,
+    qty: float,
+    *,
+    time_in_force=TimeInForce.DAY,
+    side: str):
     market_order_data = MarketOrderRequest(
         symbol=symbol,
         qty=qty,
@@ -124,12 +121,12 @@ def submit_market_order(
 
 
 def submit_buy_market_order(
-        symbol: str, 
-        qty: float,
-        *,
-        time_in_force=TimeInForce.DAY,
-        take_profit_price: float,
-        stop_loss_price: float):
+    symbol: str,
+    qty: float,
+    *,
+    time_in_force=TimeInForce.DAY,
+    take_profit_price: float,
+    stop_loss_price: float):
     market_order_data = MarketOrderRequest(
         symbol=symbol,
         qty=qty,
@@ -142,15 +139,15 @@ def submit_buy_market_order(
     market_order = TradingClientSingleton.get_instance().submit_order(
         order_data=market_order_data
     )
-    return (market_order.id)
+    return market_order.id
 
 
 def submit_limit_sell_order(
-        symbol: str,
-        qty: float,
-        limit_price: float,
-        *,
-        time_in_force=TimeInForce.GTC):
+    symbol: str,
+    qty: float,
+    limit_price: float,
+    *,
+    time_in_force=TimeInForce.GTC):
     limit_order_data = LimitOrderRequest(
         symbol=symbol,
         qty=qty,
@@ -163,13 +160,13 @@ def submit_limit_sell_order(
 
 
 def submit_limit_buy_order(
-        symbol: str,
-        qty: float,
-        limit_price: float,
-        *,
-        time_in_force=TimeInForce.GTC,
-        take_profit_price: float,
-        stop_loss_price: float):
+    symbol: str,
+    qty: float,
+    limit_price: float,
+    *,
+    time_in_force=TimeInForce.GTC,
+    take_profit_price: float,
+    stop_loss_price: float):
     limit_order_data = LimitOrderRequest(
         symbol=symbol,
         qty=qty,
@@ -183,14 +180,29 @@ def submit_limit_buy_order(
     return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 
 
+def submit_stop_sell_order(
+    symbol: str,
+    qty: float,
+    stop_price: float,
+    *,
+    time_in_force=TimeInForce.GTC):
+    stop_order_data = StopOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=OrderSide.SELL,
+        time_in_force=time_in_force,
+        stop_price=stop_price
+    )
+    return str(TradingClientSingleton.get_instance().submit_order(order_data=stop_order_data).id)
+
+
 def submit_stop_limit_sell_order(
-        symbol: str,
-        qty: float,
-        stop_price: float,
-        limit_price: float,
-        *,
-        time_in_force=TimeInForce.GTC,
-):
+    symbol: str,
+    qty: float,
+    stop_price: float,
+    limit_price: float,
+    *,
+    time_in_force=TimeInForce.GTC):
     stop_limit_order_data = StopLimitOrderRequest(
         symbol=symbol,
         qty=qty,

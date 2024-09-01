@@ -1,8 +1,7 @@
-from investor_agent.utils import TradingClientSingleton, create_option_ticker, submit_market_order, create_option_ticker
+from investor_agent.utils import TradingClientSingleton, submit_market_order, create_option_ticker, submit_stop_sell_order
 from alpaca.trading.requests import OrderSide, TimeInForce, GetOptionContractsRequest, AssetStatus
 from investor_agent.utils import submit_limit_sell_order, submit_sell_market_order, submit_stop_limit_sell_order
 from investor_agent.utils.common import now
-
 
 """
 This module exclusively handles option contracts for stocks. 
@@ -11,11 +10,11 @@ These functions are not designed to work with stocks directly.
 
 
 def get_option_contract(
-        underlying_symbol: str, 
-        option_type: str, 
-        expiration_date: str = None, 
-        strike_price: float = None, 
-        min_open_interest: int = 0):
+    underlying_symbol: str,
+    option_type: str,
+    expiration_date: str = None,
+    strike_price: float = None,
+    min_open_interest: int = 0):
     """
     Fetches an information option contract matching the given criteria.
 
@@ -56,11 +55,11 @@ def get_option_contract(
 
 
 def buy_option_by_market_price(
-        underlying_symbol: str,
-        expiration_date: str,
-        option_type: str,
-        strike_price: float,
-        qty: int):
+    underlying_symbol: str,
+    expiration_date: str,
+    option_type: str,
+    strike_price: float,
+    qty: int):
     """Buy an option at market price, retuns the order id.
 
     Args:
@@ -82,7 +81,7 @@ def buy_option_by_market_price(
 
 
 def sell_option_by_market_price_with_option_ticker(
-        option_ticker: str, qty: int):
+    option_ticker: str, qty: int):
     """
     Sells an option contract at the market price, using the option ticker.
 
@@ -94,11 +93,11 @@ def sell_option_by_market_price_with_option_ticker(
 
 
 def sell_option_by_market_price(
-        underlying_symbol: str, 
-        expiration_date: str, 
-        option_type: str, 
-        strike_price: float, 
-        qty: int):
+    underlying_symbol: str,
+    expiration_date: str,
+    option_type: str,
+    strike_price: float,
+    qty: int):
     """
     Sells an option contract at the market price, using a ticker from the underlying asset.
 
@@ -114,15 +113,15 @@ def sell_option_by_market_price(
 
 
 def sell_option_by_limit_price(
-        option_ticker: str, 
-        qty: int, 
-        limit_price: float):
+    option_ticker: str,
+    qty: int,
+    limit_price: float):
     """
     Sets the upper profit limit of the exit strategy from the existing option contract.
     Cannot be used for Stop-Loss exit strategy.
 
     Args:
-        option_ticker (str): The option contract ticker.
+        option_ticker (str): The op2tion contract ticker.
         qty (int): Quantity of the option contract to sell.
         limit_price (float): The limit price at which to sell the option contract.
     """
@@ -130,19 +129,36 @@ def sell_option_by_limit_price(
     limit_price = float(limit_price)
     return submit_limit_sell_order(option_ticker, qty, limit_price, time_in_force=TimeInForce.DAY)
 
-# def set_stop_limit_price(
-#         option_ticker: str,
-#         qty: int,
-#         stop_price: float,
-#         limit_price: float):
-#     """
-#     Sets the stop loss price trigger and limit price for the exit strategy from the existing option contract.
-#     Cannot be used for a limit exit strategy.
 
-#     Args:
-#         option_ticker (str): The ticker symbol of the option contract.
-#         qty (int): The number of option contracts to sell.
-#         stop_price (float): The price at which the stop order will be triggered.
-#         limit_price (float): The limit price at which to sell the option contract.
-#     """
-#     return submit_stop_limit_sell_order(option_ticker, qty, stop_price, limit_price, time_in_force=TimeInForce.DAY)
+def sell_option_by_stop_price(
+    option_ticker: str,
+    qty: int,
+    stop_price: float):
+    """
+    Sell option by stop price. Known as stop-loss.
+    Cannot be used for selling by a limit price or by a "stop_limit" exit strategy.
+
+    Args:
+        option_ticker (str): The ticker symbol of the option contract.
+        qty (int): The number of option contracts to sell.
+        stop_price (float): The price at which the stop order will be triggered.
+    """
+    return submit_stop_sell_order(option_ticker, qty, stop_price, time_in_force=TimeInForce.DAY)
+
+
+def sell_option_by_stop_limit_price(
+    option_ticker: str,
+    qty: int,
+    stop_price: float,
+    limit_price: float):
+    """
+    Sets the stop loss price trigger and limit price for the exit strategy from the existing option contract. Known as stop-loss with limit.
+    Cannot be used for a limit exit strategy or for a clear stop exit strategy.
+
+    Args:
+        option_ticker (str): The ticker symbol of the option contract.
+        qty (int): The number of option contracts to sell.
+        stop_price (float): The price at which the stop order will be triggered.
+        limit_price (float): The limit price at which to sell the option contract.
+    """
+    return submit_stop_limit_sell_order(option_ticker, qty, stop_price, limit_price, time_in_force=TimeInForce.DAY)
