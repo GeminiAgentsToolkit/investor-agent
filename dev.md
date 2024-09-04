@@ -8,3 +8,11 @@
 ### Install dependencies
 
 `pip install -r requirements.txt`
+
+
+# Alpaca docs
+
+- [General docs](https://docs.alpaca.markets/docs/working-with-orders)
+
+- [Alpaca PYTHON docs](https://alpaca.markets/sdks/python/trading.html) and [GutHub repo](https://github.com/alpacahq/alpaca-py/tree/master)
+
