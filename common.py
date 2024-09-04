@@ -31,4 +31,3 @@ def create_client(user_id, on_message_received):
          gcs_bucket="gemini_jobs", 
          gcs_blob=f"jobs_{user_id}.json",
          on_message=on_message_received)
-
