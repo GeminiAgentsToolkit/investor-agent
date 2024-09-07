@@ -1,6 +1,6 @@
 # To Use
 
-* Create file .env with the following internals
+* Create file .env.prod and .env.dev files with the following variables inside:
 
 ```
 ALPACA_API_KEY_ID=...
