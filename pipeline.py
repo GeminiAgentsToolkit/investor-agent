@@ -24,7 +24,7 @@ def create_client():
 def run_the_pipeline():
     investor_agent = create_client()
 
-    pipeline = EagerPipeline(default_agent=investor_agent)
+    pipeline = EagerPipeline(default_agent=investor_agent, use_convert_to_bool_agent=True)
     if not pipeline.boolean_step("is the market open now?"):
         return
     pipeline.if_step("are we using prod account(and not paper account)?", 
