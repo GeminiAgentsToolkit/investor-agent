@@ -1,4 +1,4 @@
-from investor_agent.calls import options_calls, generic_calls, stock_calls, order_calls, portfolio_calls, yfinances_calls
+from investor_agent.calls import options_calls, generic_calls, stock_calls, order_calls, portfolio_calls
 import inspect
 
 
@@ -24,5 +24,4 @@ ALL_FUNCTIONS = (get_functions_from_subpackage(options_calls) +
                   get_functions_from_subpackage(generic_calls) +
                   get_functions_from_subpackage(stock_calls) +
                   get_functions_from_subpackage(order_calls) +
-                  get_functions_from_subpackage(portfolio_calls) +
-                  get_functions_from_subpackage(yfinances_calls))
+                  get_functions_from_subpackage(portfolio_calls))

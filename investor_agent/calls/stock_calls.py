@@ -1,5 +1,20 @@
 from investor_agent.utils import submit_limit_buy_order, submit_limit_sell_order, submit_sell_market_order, submit_buy_market_order
 from alpaca.trading.requests import TimeInForce
+from investor_agent.utils import TradingClientSingleton
+from alpaca.data.requests import StockLatestQuoteRequest
+
+
+def got_stock_price(symbol: str):
+    """Get the current price of a stock.
+    
+    Args:
+        symbol: The stock symbol to get the price of.
+    """
+    data_client = TradingClientSingleton.get_histrical_data_client()
+    multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols=[symbol])
+
+    latest_multisymbol_quotes = data_client.get_stock_latest_quote(multisymbol_request_params)
+    return latest_multisymbol_quotes[symbol].ask_price
 
 
 def buy_stock_by_market_price(symbol: str, qty: float, take_profit_price: float, stop_loss_price: float):

@@ -25,17 +25,20 @@ def run_the_pipeline():
     investor_agent = create_client()
 
     pipeline = EagerPipeline(default_agent=investor_agent, use_convert_to_bool_agent=True)
-    if not pipeline.boolean_step("is the market open now?"):
-        return
+    # if not pipeline.boolean_step("is the market open now?"):
+    #     print(pipeline.summary())
+    #     return
     pipeline.if_step("are we using prod account(and not paper account)?", 
                      then_steps=["switch to paper account"], 
                      else_steps=[])
     if pipeline.boolean_step("check if I own more or equal of 1000 shares of TQQQ"):
         if pipeline.boolean_step("is there a limit sell for TQQQ exists already?"):
+            print(pipeline.summary())
             return
         pipeline.steps(["check current price of TQQQ",
                         """set limit sell order for 1000 TQQQ for price +4% of current price.
                         Keep in mind that price should be a number, not a string that computes number or a code, it has to be a precomputed number!"""])
+        print(pipeline.summary())
         return
     else:
         if pipeline.boolean_step("is there a limit buy exists already?"):
@@ -47,6 +50,11 @@ def run_the_pipeline():
                                             Do not return compute formula, do compute of the price yourself in your head. 
                                             Keep in mind that price should be a number, not a string that computes number or a code, it has to be a precomputed number!"""],
                                 else_steps=[])
+        else:
+            pipeline.step("check current price of TQQQ")
+            pipeline.step("""set limit buy order for 1000 of TQQQ for price 3 precent below the current price. 
+                            Do not return compute formula, do compute of the price yourself in your head. 
+                            Keep in mind that price should be a number, not a string that computes number or a code, it has to be a precomputed number!""")
     print(pipeline.summary())
 
 

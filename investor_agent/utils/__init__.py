@@ -3,12 +3,14 @@ from investor_agent.utils.common import parse_date
 import os
 from dotenv import load_dotenv
 from alpaca.trading.requests import StopLimitOrderRequest, StopOrderRequest, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
+from alpaca.data.historical import StockHistoricalDataClient
 
 
 # For lazy instantiation
 class TradingClientSingleton:
     _instance_prod = None
     _instance_paper = None
+    _data_instance_prod = None
     _paper = False
 
     @classmethod
@@ -43,6 +45,17 @@ class TradingClientSingleton:
                 secret_key = os.getenv('ALPACA_SECRET_KEY')
                 cls._instance_paper = TradingClient(api_key_id, secret_key, paper=cls._paper)
                 return cls._instance_paper
+            
+    @classmethod
+    def get_histrical_data_client(cls):
+        if cls._data_instance_prod is not None:
+            return cls._data_instance_prod
+        else:
+            load_dotenv(".env.prod", override=True)
+            api_key_id = os.getenv('ALPACA_API_KEY_ID')
+            secret_key = os.getenv('ALPACA_SECRET_KEY')
+            cls._data_instance_prod = StockHistoricalDataClient(api_key_id, secret_key)
+            return cls._data_instance_prod
 
 
 def create_option_ticker(
