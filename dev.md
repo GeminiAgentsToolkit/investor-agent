@@ -9,6 +9,9 @@
 
 `pip install -r requirements.txt`
 
+### Local run
+
+`export GOOGLE_APPLICATION_CREDENTIALS="./sa.json"`
 
 # Alpaca docs
 
