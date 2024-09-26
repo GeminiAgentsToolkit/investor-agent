@@ -12,7 +12,7 @@ import vertexai
 vertexai.init(project="gemini-trading-backend", location="us-west1")
 
 
-MODEL_NAME="gemini-1.5-flash"
+MODEL_NAME="gemini-1.5-flash-002"
 
 GCP_PROJECT = "gemini-trading-backend"
 GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
