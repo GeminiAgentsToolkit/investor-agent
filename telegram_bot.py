@@ -9,6 +9,7 @@ load_dotenv()
 
 chat_ids = [str(id) for id in os.getenv('TELEGRAM_CHAT_IDS').split(',')]
 telegram_token = os.getenv('TELEGRAM_TOKEN')
+VERSION = 5
 
 CLIENTS = {
 }
@@ -18,6 +19,18 @@ def generate_client_function(chat_id):
         """Send a message to the user. Use this function to send messages to the user, not just return text string. Text string that you generate(that is not passed to this function) can be random. User will not see it."""
         send_message(chat_id, msg)
     return send_msg_to_user
+
+
+async def get_version(update, context):
+    await update.message.reply_text(f"Version: {VERSION}")
+
+
+async def drop_client(update, context):
+    if str(update.message.chat_id) not in chat_ids:
+        return
+    CLIENTS.pop(update.message.chat_id, None)
+    await update.message.reply_text("Client dropped.")
+
 
 async def start(update, context):
     if str(update.message.chat_id) not in chat_ids:
@@ -49,6 +62,10 @@ def main():
     application = Application.builder().bot(bot).build()
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
+    drop_client_handler = CommandHandler('drop_client', drop_client)
+    application.add_handler(drop_client_handler)
+    get_version_handler = CommandHandler('version', get_version)
+    application.add_handler(get_version_handler)
     get_chat_id_handler = CommandHandler('get_chat_id', get_chat_id)
     application.add_handler(get_chat_id_handler)    
 
