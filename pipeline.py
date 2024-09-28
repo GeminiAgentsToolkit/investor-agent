@@ -15,7 +15,7 @@ def on_message_received(msg):
 
 def create_client():
     return investor_agent.create_agent(
-         model_name="gemini-1.5-flash", 
+         model_name="gemini-1.5-pro-002", 
          debug=True, 
          history_depth=-1,
          on_message=on_message_received)
@@ -25,9 +25,9 @@ def run_the_pipeline():
     investor_agent = create_client()
 
     pipeline = EagerPipeline(default_agent=investor_agent, use_convert_to_bool_agent=True)
-    if not pipeline.boolean_step("is the market open now?"):
-        print(pipeline.summary())
-        return
+    # if not pipeline.boolean_step("is the market open now?"):
+    #     print(pipeline.summary())
+    #     return
     pipeline.if_step("are we using prod account(and not paper account)?", 
                      then_steps=["switch to paper account"], 
                      else_steps=[])

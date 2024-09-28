@@ -9,7 +9,7 @@ load_dotenv()
 
 chat_ids = [str(id) for id in os.getenv('TELEGRAM_CHAT_IDS').split(',')]
 telegram_token = os.getenv('TELEGRAM_TOKEN')
-VERSION = 5
+VERSION = 7
 
 CLIENTS = {
 }
