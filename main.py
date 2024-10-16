@@ -17,10 +17,12 @@ clt = common.create_client("local", send_msg_to_user)
 #print(clt.send_message("can you check order status with id 21e916c1-61a8-4cb9-bbeb-b61338f4b6d9"))
 #print(clt.send_message("show me last 10 closed ordders"))
 # chat logic
+history = []
 if __name__ == "__main__":
     while True:
         user_input = input("You: ")
         if user_input == "exit":
             break
-        response = clt.send_message(user_input)
+        response, h = clt.send_message(user_input, history=history)
+        history += h
         print("Jessica:", response)
