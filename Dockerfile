@@ -22,23 +22,10 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source files
-COPY sa.json ./
-COPY .env.prod ./
-RUN echo "$(cat .env.prod)" > /app/.env
 COPY telegram_bot.py ./
 COPY telegram_client.py ./
 COPY common.py ./
 COPY investor_agent/ ./investor_agent/
-
-# Fix permissions for service account file
-USER root
-RUN chown paca:trade sa.json
-
-# Switch back to less privileged user
-USER paca
-
-# Set Google credentials environment variable
-ENV GOOGLE_APPLICATION_CREDENTIALS="/app/sa.json"
 
 # Run the Python script
 CMD ["python3", "./telegram_bot.py"]
