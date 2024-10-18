@@ -1,5 +1,5 @@
 # Use a minimal Python base image
-FROM python:3.11-slim-bookworm
+FROM python:3.11-slim
 
 # Add a new group and user before all
 RUN addgroup trade \
