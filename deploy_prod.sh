@@ -47,7 +47,12 @@ docker build -t "${IMAGE_NAME}:latest" -t "${IMAGE_NAME}:${NEW_VERSION}" .
 
 # Step 2.1: Remove old images, keeping only latest and two previous versions
 echo "Cleaning up old Docker images..."
-IMAGES_TO_DELETE=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "${IMAGE_NAME}" | grep -v "latest" | sort -t ':' -k 2 -n -r | awk 'NR>2 {print $2}')
+IMAGES_TO_DELETE=$(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" \
+    | grep "${IMAGE_NAME}" \
+    | grep -v "latest" \
+    | sort -t ':' -k 2 -n -r \
+    | awk 'NR>2 {print $2}')
+
 if [ -n "$IMAGES_TO_DELETE" ]; then
     echo "Removing old images..."
     docker rmi -f $IMAGES_TO_DELETE
