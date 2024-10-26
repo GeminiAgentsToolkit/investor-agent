@@ -26,7 +26,7 @@ Rules for working with data:
 """]
 
 
-def create_agent(*, model_name="gemini-1.5-flash", debug=True, history_depth=4, add_scheduling_functions=True, gcs_bucket=None, gcs_blob=None, on_message=None):
+def create_agent(*, model_name="gemini-1.5-flash", debug=True, add_scheduling_functions=True, gcs_bucket=None, gcs_blob=None, on_message=None):
     return agent.create_agent_from_functions_list(
          functions=calls.ALL_FUNCTIONS, 
          model_name=model_name, 

@@ -26,7 +26,6 @@ def create_client(user_id, on_message_received):
     return investor_agent.create_agent(
          model_name=MODEL_NAME, 
          debug=True, 
-         history_depth=10, 
          add_scheduling_functions=True, 
          gcs_bucket="gemini_jobs", 
          gcs_blob=f"jobs_{user_id}.json",
