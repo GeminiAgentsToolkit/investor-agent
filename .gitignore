@@ -3,6 +3,7 @@
 .env.prod
 sa.json
 testing.py
+version
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
