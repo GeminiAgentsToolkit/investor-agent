@@ -5,11 +5,10 @@ from telegram_client import send_message
 import os
 import common
 
-load_dotenv()
-
 chat_ids = [str(id) for id in os.getenv('TELEGRAM_CHAT_IDS').split(',')]
 telegram_token = os.getenv('TELEGRAM_TOKEN')
-VERSION = 8
+with open("version", "r") as version_file:
+    VERSION = version_file.read()
 
 CLIENTS = {
 }
@@ -64,7 +63,7 @@ def main():
     application.add_handler(start_handler)
     drop_client_handler = CommandHandler('drop_client', drop_client)
     application.add_handler(drop_client_handler)
-    get_version_handler = CommandHandler('version', get_version)
+    get_version_handler = CommandHandler('get_version', get_version)
     application.add_handler(get_version_handler)
     get_chat_id_handler = CommandHandler('get_chat_id', get_chat_id)
     application.add_handler(get_chat_id_handler)    
