@@ -31,7 +31,7 @@ def run_the_pipeline():
                      else_steps=[])
     tqqq_price, _ = pipeline.int_step("check current price of TQQQ")
     limit_sell_price = tqqq_price * 1.05
-    stop_loss_price = tqqq_price * 0.5
+    stop_loss_price = tqqq_price * 0.01
     buy_price = tqqq_price * 0.97
     if pipeline.boolean_step("check if I own more or equal of 100 shares of TQQQ")[0]:
         if pipeline.boolean_step("is there a limit sell for TQQQ exists already?")[0]:
