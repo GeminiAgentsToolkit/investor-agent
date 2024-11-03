@@ -17,17 +17,18 @@ ATR doesn’t provide direct buy/sell signals but indicates volatility. A high A
 
 
 # RSI Calculation
-def calculate_rsi(data: pd.DataFrame, period: int = 14) -> pd.Series:
+def calculate_rsi(ticker: str, period: int = 14) -> pd.Series:
     """
     Calculate the Relative Strength Index (RSI) for the given stock data.
 
     Args:
-        data (pd.DataFrame): Stock data containing 'Close' prices.
+        ticker (str): ticker of the stock.
         period (int, optional): Lookback period for RSI calculation. Defaults to 14.
 
     Returns:
         pd.Series: RSI values for the given stock data.
     """
+    data = get_stock_data(ticker)
     delta = data['Close'].diff(1)
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
@@ -38,7 +39,23 @@ def calculate_rsi(data: pd.DataFrame, period: int = 14) -> pd.Series:
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
 
-    return rsi
+    return rsi.iloc[-1]
+
+
+# def convert_rsi_to_signal(rsi: int) -> str:
+#     """
+#     Convert the RSI value to a buy/sell signal.
+
+#     Args:
+#         rsi (int): RSI value.
+#     """
+#     if rsi.iloc[-1] > 70:
+#         return "RSI Signal: Sell (Overbought)"
+#     elif rsi.iloc[-1] < 30:
+#         return "RSI Signal: Buy (Oversold)"
+#     else:
+#         return "RSI Signal: No clear signal (Neither/Nor)"
+
 
 # MACD Calculation
 def calculate_macd(data: pd.DataFrame, short_window: int = 12, long_window: int = 26, signal_window: int = 9) -> tuple[pd.Series, pd.Series]:
@@ -121,23 +138,6 @@ def get_stock_data(ticker: str, period: str = '3mo', interval: str = '1d') -> pd
     stock_data = yf.download(ticker, period=period, interval=interval)
     return stock_data
 
-# Signal Check for RSI
-def check_rsi_signal(rsi: pd.Series) -> str:
-    """
-    Check the RSI buy/sell signal based on RSI values.
-
-    Args:
-        rsi (pd.Series): RSI values.
-
-    Returns:
-        str: Buy, sell, or no signal based on RSI.
-    """
-    if rsi.iloc[-1] > 70:
-        return "RSI Signal: Sell (Overbought)"
-    elif rsi.iloc[-1] < 30:
-        return "RSI Signal: Buy (Oversold)"
-    else:
-        return "RSI Signal: No clear signal"
 
 # Signal Check for MACD
 def check_macd_signal(macd: pd.Series, signal_line: pd.Series) -> str:
@@ -204,23 +204,22 @@ def analyze_stock(ticker: str) -> None:
     data = get_stock_data(ticker)
 
     # Calculate indicators
-    rsi = calculate_rsi(data)
     macd, signal_line = calculate_macd(data)
     stochastic_k, stochastic_d = calculate_stochastic(data)
     atr = calculate_atr(data)
 
     # Get individual signals
-    rsi_signal = check_rsi_signal(rsi)
+    # rsi_signal = convert_rsi_to_signal(calculate_rsi(ticker))
     macd_signal = check_macd_signal(macd, signal_line)
     stochastic_signal = check_stochastic_signal(stochastic_k, stochastic_d)
     atr_signal = check_atr_signal(atr)
 
     # Print signals
-    print(f"Stock: {ticker}")
-    print(rsi_signal)
-    print(macd_signal)
-    print(stochastic_signal)
-    print(atr_signal)
+    return f"""Stock: {ticker}
+    {macd_signal}
+    {stochastic_signal}
+    {atr_signal}
+    """
 
 # Example usage
-analyze_stock("MSFT")  # You can replace 'MSFT' with any stock ticker
+# analyze_stock("MSFT")  # You can replace 'MSFT' with any stock ticker

@@ -1,5 +1,5 @@
 alpaca-py==0.30.1
-gemini_agents_toolkit==3.4.0
+gemini_agents_toolkit==3.5.0
 python-dotenv==1.0.1
 python-telegram-bot==20.6
 python-dateutil==2.9.0.post0
