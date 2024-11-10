@@ -1,6 +1,6 @@
 from investor_agent.utils import TradingClientSingleton
 from investor_agent.utils import parse_date
-from alpaca.trading.requests import GetOrdersRequest, QueryOrderStatus
+from alpaca.trading.requests import GetOrdersRequest, QueryOrderStatus, OrderSide
 from dateutil import parser
 
 
@@ -23,12 +23,34 @@ def cancel_order_by_id(order_id: str):
     TradingClientSingleton.get_instance().cancel_order_by_id(order_id=order_id)
 
 
-def get_100_latest_open_orders():
-    """Returns a string with the open orders for the account.
+def get_10_latest_open_buy_orders_for_ticker(ticker: str):
+    """Returns list of open buy orders for a specific ticker.
+
+    Args:
+        ticker: The stock symbol to filter the orders.
     """
     get_orders_data = GetOrdersRequest(
         status=QueryOrderStatus.OPEN,
-        limit=100,
+        limit=10,
+        symbols=[ticker] if ticker else None,
+        side=OrderSide.BUY,
+        nested=True  # show nested multi-leg orders
+    )
+    orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)
+    return "\n".join([str(order) for order in orders])
+
+
+def get_10_latest_open_sell_orders_for_ticker(ticker: str):
+    """Returns a string with the open sell orders for a specific ticker.
+
+    Args:
+        ticker: The stock symbol to filter the orders.
+    """
+    get_orders_data = GetOrdersRequest(
+        status=QueryOrderStatus.OPEN,
+        limit=10,
+        symbols=[ticker] if ticker else None,
+        side=OrderSide.SELL,
         nested=True  # show nested multi-leg orders
     )
     orders = TradingClientSingleton.get_instance().get_orders(filter=get_orders_data)

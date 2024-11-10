@@ -38,7 +38,7 @@ def run_the_pipeline():
             print(pipeline.summarize_full_history()[0])
         else:
             pipeline.step(f"""set limit sell order for 100 TQQQ for price {limit_sell_price}""")
-    is_there_a_limit_buy, history_with_buy_order = pipeline.boolean_step("is there a non canceled (and non panding canceled) 'limit buy' exists already?")
+    is_there_a_limit_buy, history_with_buy_order = pipeline.boolean_step("is there a non canceled (and non panding canceled) 'limit buy' for TQQQ exists already?")
     rsi, _ = pipeline.int_step("calcualte RSI for TQQQ")
     if rsi < 30:
         if is_there_a_limit_buy:
