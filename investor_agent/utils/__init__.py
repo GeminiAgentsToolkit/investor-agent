@@ -178,17 +178,25 @@ def submit_limit_buy_order(
     limit_price: float,
     *,
     time_in_force=TimeInForce.GTC,
-    take_profit_price: float,
-    stop_loss_price: float):
+    take_profit_price: float = None,
+    stop_loss_price: float = None):
+    take_profit_order = None
+    stop_loss_order = None
+    order_class = OrderClass.SIMPLE
+    if take_profit_price is not None:
+        take_profit_order = TakeProfitRequest(limit_price=take_profit_price)
+        order_class = OrderClass.BRACKET
+    if stop_loss_price is not None:
+        stop_loss_order = StopLossRequest(stop_price=stop_loss_price)
     limit_order_data = LimitOrderRequest(
         symbol=symbol,
         qty=qty,
         side=OrderSide.BUY,
         time_in_force=time_in_force,
         limit_price=limit_price,
-        order_class=OrderClass.BRACKET,
-        take_profit=TakeProfitRequest(limit_price=take_profit_price),
-        stop_loss=StopLossRequest(stop_price=stop_loss_price)
+        order_class=order_class,
+        take_profit=take_profit_order,
+        stop_loss=stop_loss_order
     )
     return str(TradingClientSingleton.get_instance().submit_order(order_data=limit_order_data).id)
 

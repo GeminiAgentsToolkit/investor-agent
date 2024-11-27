@@ -47,16 +47,16 @@ def submit_stocks_limit_buy_order(
         symbol: str,
         qty: float,
         limit_price: float,
-        take_profit_price: float,
-        stop_loss_price: float):
+        take_profit_price: float = None,
+        stop_loss_price: float = None):
     """Buy a stock at a specific price, retuns the order id. Alpaca allows you to buy shares in parts, not necessarily in whole parts. For example, you can buy/sell 0.5 or 1.8 shares.
 
     Args:
         symbol: The stock symbol to buy.
         qty: The quantity of stock to buy. Mush be a positive integer.
         limit_price: The price at which the limit order will be executed.
-        take_profit_price: The price at which the take profit order will be executed.
-        stop_loss_price: The price at which the stop loss order will be executed.
+        take_profit_price (optional): The price at which the take profit order will be executed.
+        stop_loss_price (optional): The price at which the stop loss order will be executed.
     """
     return submit_limit_buy_order(symbol=symbol, qty=qty, limit_price=limit_price, take_profit_price=take_profit_price, stop_loss_price=stop_loss_price)
 
