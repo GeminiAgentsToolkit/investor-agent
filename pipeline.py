@@ -26,40 +26,48 @@ def run_the_pipeline():
     # if not pipeline.boolean_step("is the market open now?")[0]:
     #     print(pipeline.summary())
     #     return
-    pipeline.if_step("are we using prod account(and not paper account)?", 
-                     then_steps=["switch to paper account"], 
+    pipeline.if_step("Is the current account a production account (not a paper account)?", 
+                     then_steps=["Switch to paper account"], 
                      else_steps=[])
-    tqqq_price, _ = pipeline.int_step("check current price of TQQQ")
+    tqqq_price, _ = pipeline.int_step("Get the current TQQQ price")
     limit_sell_price = tqqq_price * 1.05
     stop_loss_price = tqqq_price * 0.01
     buy_price = tqqq_price * 0.97
-    own_more_than_100, _ = pipeline.boolean_step("check if I own more or equal of 100 shares of TQQQ")
+        # Check if we currently own at least 100 shares of TQQQ
+    own_more_than_100, _ = pipeline.boolean_step("Do I currently own 100 or more shares of TQQQ?")
     if own_more_than_100:
-        if pipeline.boolean_step("is there a limit sell for TQQQ exists already?")[0]:
+        # Check if a limit sell order for TQQQ already exists
+        if pipeline.boolean_step("Does a limit sell order for TQQQ already exist?")[0]:
             print(pipeline.summarize_full_history()[0])
         else:
-            pipeline.step(f"""set limit sell order for 100 TQQQ for price {limit_sell_price}""")
-    is_there_a_limit_buy, history_with_buy_order = pipeline.boolean_step("is there a non canceled (and non panding canceled) 'limit buy' for TQQQ exists already?")
-    # rsi, _ = pipeline.int_step("calcualte RSI for TQQQ")
-    # if rsi < 30:
-    #     if is_there_a_limit_buy:
-    #         pipeline.step("cancel buy order for TQQQ", history=history_with_buy_order)
-    #     pipeline.step(f"buy 100 TQQQ shares (with the market price, not a limit buy), with limit sell price {limit_sell_price} and stop loss price of {stop_loss_price}")
-    # else:
+            pipeline.step(f"Place a limit sell order for 100 shares of TQQQ at {limit_sell_price}")
+
+    # Check if there's an active (non-canceled) limit buy order for TQQQ
+    is_there_a_limit_buy, history_with_buy_order = pipeline.boolean_step(
+        "Is there an active (non-canceled, not pending cancel) limit buy order for TQQQ?"
+    )
     if is_there_a_limit_buy:
         if own_more_than_100:
-            pipeline.step("cancel limit buy order for TQQQ", history=history_with_buy_order)
+            pipeline.step("Cancel the active limit buy order for TQQQ", history=history_with_buy_order)
         else:
-            _, history_with_buy_orders = pipeline.step("get latest active limit buy orders for TQQQ")
-            limit_buy_price, _ = pipeline.float_step("what is the 'limit buy price' of a latest non canceled 'limit buy' order we have for TQQQ", 
-                                                        history=history_with_buy_orders)
-            pipeline.if_step(f"is the price of 'limit buy' is strictly lower than {limit_buy_price * 0.95}?",
-                                then_steps=["cancel limit buy order",
-                                            f"set limit buy order for 100 of TQQQ for {buy_price}."],
-                                else_steps=[],
-                                history=history_with_buy_orders)
+            _, history_with_buy_orders = pipeline.step("Retrieve the latest active limit buy orders for TQQQ", 
+                                                       history=history_with_buy_order)
+            limit_buy_price, _ = pipeline.float_step(
+                "Get the limit buy price of the latest active limit buy order for TQQQ", 
+                history=history_with_buy_orders
+            )
+            pipeline.if_step(
+                f"Is the limit buy price strictly lower than {limit_buy_price * 0.95}?",
+                then_steps=[
+                    "Cancel the active limit buy order for TQQQ",
+                    f"Place a limit buy order for 100 shares of TQQQ at {buy_price}"
+                ],
+                else_steps=[],
+                history=history_with_buy_orders
+            )
     elif not own_more_than_100:
-        pipeline.step(f"set limit buy order for 100 of TQQQ for price {buy_price}.")
+        pipeline.step(f"Place a limit buy order for 100 shares of TQQQ at {buy_price}")
+
     pipeline.summarize_full_history()[0]
 
 
