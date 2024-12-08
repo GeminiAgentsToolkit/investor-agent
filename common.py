@@ -9,17 +9,17 @@ from google.oauth2 import service_account
 import vertexai
 
 
-vertexai.init(project="gemini-trading-backend", location="us-west1")
+vertexai.init(project="ai-agent-trader", location="us-west1")
 
 
 MODEL_NAME="gemini-1.5-flash-002"
 
-GCP_PROJECT = "gemini-trading-backend"
-GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
-    './sa.json')
+# GCP_PROJECT = "gemini-trading-backend"
+# GCP_CREDENTAILS = service_account.Credentials.from_service_account_file(
+#     './sa.json')
 
-logging_client = google.cloud.logging.Client(project=GCP_PROJECT, credentials=GCP_CREDENTAILS)
-logging_client.setup_logging()
+# logging_client = google.cloud.logging.Client(project=GCP_PROJECT, credentials=GCP_CREDENTAILS)
+# logging_client.setup_logging()
 
 
 def create_client(user_id, on_message_received):

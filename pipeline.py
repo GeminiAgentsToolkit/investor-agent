@@ -8,7 +8,7 @@ import time
 import traceback
 
 
-vertexai.init(project="gemini-trading-backend", location="us-west1")
+vertexai.init(project="ai-agent-trader", location="us-west1")
 
 
 def on_message(message):

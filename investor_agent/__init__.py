@@ -32,7 +32,4 @@ def create_agent(*, model_name="gemini-1.5-flash", debug=True, add_scheduling_fu
          model_name=model_name, 
          debug=debug, 
          system_instruction=PROMPT, 
-         add_scheduling_functions=add_scheduling_functions, 
-         gcs_bucket=gcs_bucket, 
-         gcs_blob=gcs_blob,
          on_message=on_message)

@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from alpaca.trading.requests import StopLimitOrderRequest, StopOrderRequest, MarketOrderRequest, OrderClass, TimeInForce, LimitOrderRequest, StopLossRequest, TakeProfitRequest, OrderSide
 from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import BaseCryptoLatestDataRequest, CryptoBarsRequest, CryptoQuoteRequest, CryptoTradesRequest, CryptoLatestQuoteRequest, CryptoLatestTradeRequest, CryptoSnapshotRequest
 
 
 # For lazy instantiation
@@ -11,7 +12,7 @@ class TradingClientSingleton:
     _instance_prod = None
     _instance_paper = None
     _data_instance_prod = None
-    _paper = False
+    _paper = True
 
     @classmethod
     def is_paper(cls):
@@ -97,6 +98,15 @@ def create_option_ticker(
 
     return ticker
 
+def get_crypto_price(symbol: str):
+    # Create a request for the latest trade data for the given symbol
+    latest_trade_request = BaseCryptoLatestDataRequest(symbol)
+
+    crypto_order = TradingClientSingleton.get_instance().submit_order(
+        order_data=latest_trade_request
+    )
+
+    return str(crypto_order)
 
 def submit_sell_market_order(
     symbol: str,
@@ -113,7 +123,6 @@ def submit_sell_market_order(
         order_data=market_order_data
     )
     return str(market_order.id)
-
 
 def submit_market_order(
     symbol: str,
